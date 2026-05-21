@@ -336,10 +336,12 @@ class Article(TimeStampedModel):
 
     @property
     def display_image_url(self):
-        if self.image:
-            return self.image.url
+        from django.core.files.storage import default_storage
+
         from pharmacy.services.article_images import external_article_image_url
 
+        if self.image and self.image.name and default_storage.exists(self.image.name):
+            return self.image.url
         return external_article_image_url(self.pk)
 
 
@@ -396,10 +398,12 @@ class ContactPerson(TimeStampedModel):
 
     @property
     def display_photo_url(self):
-        if self.photo:
-            return self.photo.url
+        from django.core.files.storage import default_storage
+
         from pharmacy.services.contact_images import external_contact_photo_url
 
+        if self.photo and self.photo.name and default_storage.exists(self.photo.name):
+            return self.photo.url
         return external_contact_photo_url(
             contact_pk=self.pk,
             email=self.email,

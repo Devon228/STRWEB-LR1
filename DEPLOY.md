@@ -167,6 +167,7 @@ python manage.py createsuperuser
 | Статика не грузится | Убедитесь, что `collectstatic` в Build Command |
 | Нет данных | Выполните `seed_data` в Shell или добавьте в Build Command |
 | На «Контактах» только 3 человека | `python manage.py seed_data` в Shell (добавит остальных до 12) |
+| Вместо фото — текст / битая картинка | На Render нет постоянного `media/`; код отдаёт ui-avatars.com, если файла нет на диске (нужен redeploy с актуальным кодом) |
 | Погода не работает | Задайте `OPENWEATHER_API_KEY` |
 | Нет графиков на `/analytics/` | Графики встроены в HTML (base64); обновите код и сделайте Redeploy. Нужны продажи в БД (`seed_data`) |
 
