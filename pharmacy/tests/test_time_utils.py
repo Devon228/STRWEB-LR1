@@ -42,4 +42,4 @@ def test_article_display_image_url_external():
 
     article = Article(pk=7, title='t', summary='s')
     assert article.display_image_url == external_article_image_url(7)
-    assert 'pharmacy' in article.display_image_url
+    assert 'picsum.photos' in article.display_image_url or 'loremflickr' in article.display_image_url

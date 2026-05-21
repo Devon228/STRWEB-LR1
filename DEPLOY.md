@@ -81,7 +81,7 @@ image: YOUR_DOCKERHUB_USER/pharmacy-lr5:latest
 | **Region** | Frankfurt / ближайший к вам |
 | **Branch** | `main` |
 | **Root Directory** | *(пусто, если проект в корне репо)* |
-| **Build Command** | `pip install -r requirements.txt && python manage.py collectstatic --noinput && python manage.py migrate` |
+| **Build Command** | `pip install -r requirements.txt && python manage.py collectstatic --noinput && python manage.py migrate && python manage.py seed_data` |
 | **Start Command** | `gunicorn PharmacyProject.wsgi:application --bind 0.0.0.0:$PORT --workers 3 --timeout 120` |
 
 > Render задаёт переменную `$PORT` автоматически — не подставляйте 8000 в Start Command.
@@ -112,12 +112,26 @@ CSRF_TRUSTED_ORIGINS=https://pharmacy-lr5.onrender.com
 LOG_LEVEL=INFO
 ```
 
-### 5. После первого деплоя
+### 5. Демо-данные и контакты (важно)
 
-В **Shell** Render (или однократно локально с prod `DATABASE_URL`):
+Команда `seed_data` **без** `--flush`:
+
+- при **пустой** БД — загружает всё (медикаменты, пользователи, **12 контактов** с фото);
+- при **уже заполненной** БД — **добавляет недостающих контактов** и подгружает фото (если их было только 3).
+
+**Вариант A (рекомендуется):** добавьте `seed_data` в **Build Command** (см. таблицу выше) и сделайте **Manual Deploy** / дождитесь автодеплоя после push.
+
+**Вариант B (один раз вручную):** Render → ваш Web Service → **Shell**:
 
 ```bash
 python manage.py seed_data
+```
+
+В логе должно быть что-то вроде: `Контакты: всего 12, добавлено 9, загружено фото ...`
+
+Суперпользователь (если ещё нет):
+
+```bash
 python manage.py createsuperuser
 ```
 
@@ -151,7 +165,8 @@ python manage.py createsuperuser
 | `DisallowedHost` | Добавьте домен Render в `ALLOWED_HOSTS` |
 | CSRF 403 | Добавьте `https://...onrender.com` в `CSRF_TRUSTED_ORIGINS` |
 | Статика не грузится | Убедитесь, что `collectstatic` в Build Command |
-| Нет данных | Выполните `seed_data` в Shell |
+| Нет данных | Выполните `seed_data` в Shell или добавьте в Build Command |
+| На «Контактах» только 3 человека | `python manage.py seed_data` в Shell (добавит остальных до 12) |
 | Погода не работает | Задайте `OPENWEATHER_API_KEY` |
 | Нет графиков на `/analytics/` | Графики встроены в HTML (base64); обновите код и сделайте Redeploy. Нужны продажи в БД (`seed_data`) |
 

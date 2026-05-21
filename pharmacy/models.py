@@ -400,7 +400,11 @@ class ContactPerson(TimeStampedModel):
             return self.photo.url
         from pharmacy.services.contact_images import external_contact_photo_url
 
-        return external_contact_photo_url(self.pk)
+        return external_contact_photo_url(
+            contact_pk=self.pk,
+            email=self.email,
+            full_name=self.full_name,
+        )
 
 
 class Vacancy(TimeStampedModel):

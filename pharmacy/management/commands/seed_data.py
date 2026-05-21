@@ -25,7 +25,9 @@ from pharmacy.models import (
     Supplier,
     Vacancy,
 )
+from pharmacy.contact_seed import CONTACTS_SEED
 from pharmacy.roles import GROUP_CUSTOMER, GROUP_EMPLOYEE, ensure_role_groups
+from pharmacy.services.contact_photos import download_contact_photo
 
 User = get_user_model()
 
@@ -43,10 +45,15 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         if options['flush']:
             self._flush()
-        elif Medication.objects.exists():
+            self._seed()
+            self.stdout.write(self.style.SUCCESS('Демо-данные успешно загружены.'))
+            return
+        if Medication.objects.exists():
+            created, photos = self._ensure_contacts()
             self.stdout.write(
-                self.style.WARNING(
-                    'Данные уже есть. Используйте --flush для пересоздания.',
+                self.style.SUCCESS(
+                    f'Контакты: всего {ContactPerson.objects.filter(is_active=True).count()}, '
+                    f'добавлено {created}, загружено фото {photos}.',
                 ),
             )
             return
@@ -412,87 +419,7 @@ class Command(BaseCommand):
         ]
         for question, answer in faq:
             Glossary.objects.create(question=question, answer=answer)
-        contacts = [
-            (
-                'Светлана Мороз',
-                'Консультации по ассортименту и заказам.',
-                '+375 (29) 101-01-01',
-                'info@zdorovie-plus.by',
-            ),
-            (
-                'Дмитрий Кулак',
-                'Вопросы доставки и самовывоза.',
-                '+375 (29) 202-02-02',
-                'delivery@zdorovie-plus.by',
-            ),
-            (
-                'Екатерина Янковская',
-                'Обратная связь и отзывы клиентов.',
-                '+375 (29) 303-03-03',
-                'feedback@zdorovie-plus.by',
-            ),
-            (
-                'Игорь Левченко',
-                'Главный фармацевт, консультации по рецептурным препаратам.',
-                '+375 (29) 404-04-04',
-                'pharmacist@zdorovie-plus.by',
-            ),
-            (
-                'Ольга Петрова',
-                'Оформление заказов и программа лояльности.',
-                '+375 (29) 505-05-05',
-                'orders@zdorovie-plus.by',
-            ),
-            (
-                'Андрей Савицкий',
-                'Работа с поставщиками и закупки.',
-                '+375 (29) 606-06-06',
-                'supply@zdorovie-plus.by',
-            ),
-            (
-                'Марина Козлова',
-                'Консультации по БАДам и витаминам.',
-                '+375 (29) 707-07-07',
-                'supplements@zdorovie-plus.by',
-            ),
-            (
-                'Павел Жук',
-                'Техническая поддержка онлайн-заказов.',
-                '+375 (29) 808-08-08',
-                'support@zdorovie-plus.by',
-            ),
-            (
-                'Татьяна Волкова',
-                'Вопросы по акциям и промокодам.',
-                '+375 (29) 909-09-09',
-                'promo@zdorovie-plus.by',
-            ),
-            (
-                'Николай Орлов',
-                'Приёмка товара и контроль сроков годности.',
-                '+375 (29) 110-11-11',
-                'warehouse@zdorovie-plus.by',
-            ),
-            (
-                'Юлия Мельник',
-                'Корпоративные клиенты и оптовые заказы.',
-                '+375 (29) 211-12-12',
-                'b2b@zdorovie-plus.by',
-            ),
-            (
-                'Владимир Сидоренко',
-                'Руководитель сети, партнёрства и СМИ.',
-                '+375 (29) 312-13-13',
-                'director@zdorovie-plus.by',
-            ),
-        ]
-        for name, job, phone, email in contacts:
-            ContactPerson.objects.create(
-                full_name=name,
-                job_description=job,
-                phone=phone,
-                email=email,
-            )
+        self._seed_contacts(download_photos=True)
         vacancies = [
             ('Фармацевт', 'Требуется опыт работы от 1 года, знание рецептуры.'),
             ('Кладовщик', 'Приёмка товара, учёт на складе.'),
@@ -511,6 +438,67 @@ class Command(BaseCommand):
                 rating=rating,
                 text=text,
             )
+
+    def _seed_contacts(self, download_photos=False):
+        for name, job, phone, email in CONTACTS_SEED:
+            contact = ContactPerson.objects.create(
+                full_name=name,
+                job_description=job,
+                phone=phone,
+                email=email,
+                is_active=True,
+            )
+            if download_photos:
+                self._try_download_contact_photo(contact)
+
+    def _ensure_contacts(self):
+        """Добавляет недостающих контактов и подгружает фото (для уже существующей БД)."""
+        created = 0
+        photos = 0
+        for name, job, phone, email in CONTACTS_SEED:
+            contact, was_created = ContactPerson.objects.get_or_create(
+                email=email,
+                defaults={
+                    'full_name': name,
+                    'job_description': job,
+                    'phone': phone,
+                    'is_active': True,
+                },
+            )
+            if was_created:
+                created += 1
+            else:
+                updated = False
+                if contact.full_name != name:
+                    contact.full_name = name
+                    updated = True
+                if contact.job_description != job:
+                    contact.job_description = job
+                    updated = True
+                if contact.phone != phone:
+                    contact.phone = phone
+                    updated = True
+                if not contact.is_active:
+                    contact.is_active = True
+                    updated = True
+                if updated:
+                    contact.save()
+            if not contact.photo:
+                if self._try_download_contact_photo(contact):
+                    photos += 1
+        return created, photos
+
+    def _try_download_contact_photo(self, contact):
+        try:
+            download_contact_photo(contact)
+            return True
+        except Exception as exc:
+            self.stdout.write(
+                self.style.WARNING(
+                    f'Не удалось загрузить фото для {contact.full_name}: {exc}',
+                ),
+            )
+            return False
 
     def _seed_promos(self):
         today = timezone.localdate()

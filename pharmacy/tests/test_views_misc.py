@@ -99,6 +99,24 @@ def test_staff_purchase_create_success(
 
 
 @pytest.mark.django_db
+def test_ensure_contacts_adds_missing(db):
+    from pharmacy.contact_seed import CONTACTS_SEED
+    from pharmacy.management.commands.seed_data import Command
+
+    ContactPerson.objects.all().delete()
+    ContactPerson.objects.create(
+        full_name='Светлана Мороз',
+        job_description='Консультации.',
+        phone='+375 (29) 101-01-01',
+        email='info@zdorovie-plus.by',
+    )
+    cmd = Command()
+    created, _photos = cmd._ensure_contacts()
+    assert ContactPerson.objects.filter(is_active=True).count() == len(CONTACTS_SEED)
+    assert created == len(CONTACTS_SEED) - 1
+
+
+@pytest.mark.django_db
 def test_contact_list_shows_photo_for_each(client):
     for i in range(10):
         ContactPerson.objects.create(
