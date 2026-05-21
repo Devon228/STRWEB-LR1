@@ -24,5 +24,6 @@ urlpatterns = [
     path('', include('pharmacy.urls')),
 ]
 
-if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+# Media: в DEBUG через static(); в продакшене — для загрузок пользователя (фото медикаментов).
+# Графики аналитики встроены как base64 и media не требуют.
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -137,8 +137,15 @@
 
 <section>
     <h3>Графики (matplotlib)</h3>
-    <p><img src="{{ chart_sales_url }}" alt="Продажи по датам" width="700"></p>
-    <p><img src="{{ chart_categories_url }}" alt="Популярность категорий" width="700"></p>
+    {% if chart_errors %}
+        <p>Ошибка построения графиков: {{ chart_errors|join:", " }}</p>
+    {% endif %}
+    {% if chart_sales_url %}
+        <p><img src="{{ chart_sales_url }}" alt="Продажи по датам" width="700"></p>
+    {% endif %}
+    {% if chart_categories_url %}
+        <p><img src="{{ chart_categories_url }}" alt="Популярность категорий" width="700"></p>
+    {% endif %}
 </section>
 
 <p><a href="{% url 'pharmacy:owner_dashboard' %}">← Панель владельца</a></p>

@@ -1,8 +1,9 @@
+import logging
 from decimal import Decimal
 from zoneinfo import ZoneInfo
 
-from django import forms
 from asgiref.sync import async_to_sync
+from django import forms
 from django.contrib import messages
 from django.contrib.auth import login
 from django.contrib.auth.views import LoginView, LogoutView
@@ -61,6 +62,8 @@ from pharmacy.time_utils import (
     get_session_timezone,
     current_moment_context,
 )
+
+logger = logging.getLogger('pharmacy')
 
 
 class HomeView(TemplateView):
@@ -491,8 +494,15 @@ class AnalyticsView(OwnerRequiredMixin, TemplateView):
         context['exchange'] = exchange
         context['stats'] = compute_pharmacy_statistics()
 
-        context['chart_sales_url'] = generate_sales_by_date_chart()
-        context['chart_categories_url'] = generate_category_popularity_chart()
+        context['chart_errors'] = []
+        try:
+            context['chart_sales_url'] = generate_sales_by_date_chart()
+            context['chart_categories_url'] = generate_category_popularity_chart()
+        except Exception as exc:
+            logger.exception('Chart generation failed: %s', exc)
+            context['chart_sales_url'] = ''
+            context['chart_categories_url'] = ''
+            context['chart_errors'].append(str(exc))
 
         utc_tz = ZoneInfo('UTC')
         medications_dates = []

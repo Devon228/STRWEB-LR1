@@ -1,4 +1,6 @@
 export OPENWEATHER_API_KEY=e88847dc22c2cd33c674e25cbe5a5eda
+secret key q2u1%cja^ui+t2sz+9wof@h!cz(_7l(g9ji8$qy79vg^96ube7
+
 
 Задание.
 Реализовать веб-сайт с использованием веб-фреймворка Django по индивидуальному заданию.

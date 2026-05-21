@@ -1,11 +1,14 @@
+import base64
 import logging
-from pathlib import Path
+import os
+from io import BytesIO
 
 import matplotlib
 
+os.environ.setdefault('MPLCONFIGDIR', '/tmp/matplotlib')
+
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
-from django.conf import settings
 from django.db.models import Count, Sum
 from django.db.models.functions import TruncDate
 
@@ -13,17 +16,19 @@ from pharmacy.models import MedicationCategory, Sale
 
 logger = logging.getLogger('pharmacy.charts')
 
-ANALYTICS_DIR = 'analytics'
 
-
-def _analytics_dir():
-    path = Path(settings.MEDIA_ROOT) / ANALYTICS_DIR
-    path.mkdir(parents=True, exist_ok=True)
-    return path
+def _fig_to_data_uri(fig):
+    """PNG в data URI — работает на Render без раздачи /media/."""
+    buffer = BytesIO()
+    fig.savefig(buffer, format='png', dpi=100, bbox_inches='tight')
+    plt.close(fig)
+    buffer.seek(0)
+    encoded = base64.b64encode(buffer.read()).decode('ascii')
+    return f'data:image/png;base64,{encoded}'
 
 
 def generate_sales_by_date_chart():
-    """Линейный график суммы продаж по датам."""
+    """Линейный график суммы продаж по датам. Возвращает data URI для шаблона."""
     rows = (
         Sale.objects.annotate(day=TruncDate('sold_at'))
         .values('day')
@@ -43,16 +48,11 @@ def generate_sales_by_date_chart():
     ax.set_ylabel('Сумма')
     plt.xticks(rotation=45, ha='right')
     fig.tight_layout()
-    filename = 'sales_by_date.png'
-    filepath = _analytics_dir() / filename
-    fig.savefig(filepath, dpi=100)
-    plt.close(fig)
-    logger.info('Chart saved: %s', filepath)
-    return f'{settings.MEDIA_URL}{ANALYTICS_DIR}/{filename}'
+    return _fig_to_data_uri(fig)
 
 
 def generate_category_popularity_chart():
-    """Столбчатая диаграмма популярности категорий по числу продаж."""
+    """Столбчатая диаграмма популярности категорий. Возвращает data URI."""
     rows = (
         MedicationCategory.objects.annotate(
             sales_count=Count('medications__sales', distinct=True),
@@ -70,9 +70,4 @@ def generate_category_popularity_chart():
     ax.set_ylabel('Продажи')
     plt.xticks(rotation=30, ha='right')
     fig.tight_layout()
-    filename = 'category_popularity.png'
-    filepath = _analytics_dir() / filename
-    fig.savefig(filepath, dpi=100)
-    plt.close(fig)
-    logger.info('Chart saved: %s', filepath)
-    return f'{settings.MEDIA_URL}{ANALYTICS_DIR}/{filename}'
+    return _fig_to_data_uri(fig)
