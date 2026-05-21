@@ -1,0 +1,12 @@
+{% extends 'pharmacy/base.html' %}
+{% block title %}Регистрация{% endblock %}
+{% block content %}
+<h2>Регистрация</h2>
+<form method="post" novalidate>
+    {% csrf_token %}
+    {{ form.as_p }}
+    <p><small>Телефон: {{ form.phone.field.widget.attrs.title }}</small></p>
+    <p><small>Возраст: не менее 18 лет (дата рождения не позже max в поле).</small></p>
+    <button type="submit">Зарегистрироваться</button>
+</form>
+{% endblock %}

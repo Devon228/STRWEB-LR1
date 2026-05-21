@@ -1,0 +1,17 @@
+{% extends 'pharmacy/base.html' %}
+{% block title %}Мои поставщики{% endblock %}
+{% block content %}
+<h2>Поставщики, с которыми вы работаете</h2>
+<ul>
+    {% for supplier in suppliers %}
+        <li>
+            <strong>{{ supplier.name }}</strong><br>
+            Контакт: {{ supplier.contact_person }}<br>
+            Тел.: {{ supplier.phone }}<br>
+            Email: {{ supplier.email }}
+        </li>
+    {% empty %}
+        <li>Поставщики не назначены.</li>
+    {% endfor %}
+</ul>
+{% endblock %}

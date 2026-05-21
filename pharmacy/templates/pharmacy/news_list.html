@@ -1,0 +1,22 @@
+{% extends 'pharmacy/base.html' %}
+{% block title %}Новости{% endblock %}
+{% block content %}
+<h2>Новости</h2>
+{% for article in articles %}
+    <article>
+        <h3>{{ article.title }}</h3>
+        {% if article.image %}
+            <p><img src="{{ article.image.url }}" alt="{{ article.title }}" width="300"></p>
+        {% endif %}
+        <p>{{ article.summary }}</p>
+        <p><small>{{ article.published_at|date:"d/m/Y" }}</small></p>
+        <p><a href="{% url 'pharmacy:news_detail' article.pk %}">Читать далее</a></p>
+        <hr>
+    </article>
+{% empty %}
+    <p>Новостей нет.</p>
+{% endfor %}
+{% if page_obj %}
+    <p>Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}</p>
+{% endif %}
+{% endblock %}

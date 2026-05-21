@@ -1,0 +1,13 @@
+{% extends 'pharmacy/base.html' %}
+{% block title %}Словарь терминов{% endblock %}
+{% block content %}
+<h2>Словарь терминов и понятий</h2>
+<dl>
+    {% for entry in entries %}
+        <dt><strong>{{ entry.question }}</strong> <small>({{ entry.added_at|date:"d/m/Y" }})</small></dt>
+        <dd>{{ entry.answer|linebreaks }}</dd>
+    {% empty %}
+        <p>Записей нет.</p>
+    {% endfor %}
+</dl>
+{% endblock %}

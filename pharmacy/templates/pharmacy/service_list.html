@@ -1,0 +1,12 @@
+{% extends 'pharmacy/base.html' %}
+{% block title %}Доп. услуги{% endblock %}
+{% block content %}
+<h2>Дополнительные услуги</h2>
+<ul>
+    {% for service in services %}
+        <li><strong>{{ service.name }}</strong> — {{ service.price }} BYN<br>{{ service.description }}</li>
+    {% empty %}
+        <li>Услуги не найдены.</li>
+    {% endfor %}
+</ul>
+{% endblock %}

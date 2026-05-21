@@ -1,0 +1,21 @@
+{% extends 'pharmacy/base.html' %}
+{% block title %}Промокоды{% endblock %}
+{% block content %}
+<h2>Промокоды и купоны</h2>
+<h3>Действующие</h3>
+<ul>
+    {% for promo in active_promos %}
+        <li>{{ promo.code }} — скидка {{ promo.discount_percent }}% ({{ promo.get_kind_display }})</li>
+    {% empty %}
+        <li>Нет действующих промокодов.</li>
+    {% endfor %}
+</ul>
+<h3>Архив</h3>
+<ul>
+    {% for promo in archived_promos %}
+        <li>{{ promo.code }} — {{ promo.discount_percent }}% (архив)</li>
+    {% empty %}
+        <li>Архив пуст.</li>
+    {% endfor %}
+</ul>
+{% endblock %}

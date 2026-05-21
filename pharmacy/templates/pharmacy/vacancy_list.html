@@ -1,0 +1,15 @@
+{% extends 'pharmacy/base.html' %}
+{% block title %}Вакансии{% endblock %}
+{% block content %}
+<h2>Вакансии</h2>
+<ul>
+    {% for vacancy in vacancies %}
+        <li>
+            <strong>{{ vacancy.title }}</strong><br>
+            {{ vacancy.description|linebreaks }}
+        </li>
+    {% empty %}
+        <li>Активных вакансий нет.</li>
+    {% endfor %}
+</ul>
+{% endblock %}

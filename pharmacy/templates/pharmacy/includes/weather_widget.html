@@ -1,0 +1,14 @@
+{% if weather %}
+<aside
+    role="complementary"
+    aria-label="Погода в городе аптеки"
+    style="position:fixed;bottom:12px;right:12px;z-index:1000;border:1px solid #333;padding:6px 8px;background:#f8f8f8;max-width:140px;font-size:12px;line-height:1.35;"
+>
+    <strong>{{ weather.city }}</strong>
+    {% if weather.ok %}
+        <br>{{ weather.temperature }} °C, влаж. {{ weather.humidity }}%
+    {% else %}
+        <br><small>{{ weather.error }}</small>
+    {% endif %}
+</aside>
+{% endif %}

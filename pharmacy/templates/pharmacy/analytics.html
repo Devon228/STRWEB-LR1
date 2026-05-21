@@ -1,0 +1,145 @@
+{% extends 'pharmacy/base.html' %}
+{% block title %}Аналитика{% endblock %}
+{% block content %}
+<h2>Аналитика и интеграции</h2>
+<p>Доступно только владельцу (superuser).</p>
+
+<section>
+    <h3>Дата и часовой пояс</h3>
+    <p><strong>Ваш пояс:</strong> {{ user_timezone_name }}</p>
+    <p><strong>Сегодня:</strong> {{ weekday_name }}, {{ current_date_user }} (локально)</p>
+    <p><strong>UTC:</strong> {{ current_date_utc }}</p>
+    <p><strong>Локальное время:</strong> {{ current_datetime_user }}</p>
+    <form method="post">
+        {% csrf_token %}
+        {{ timezone_form.as_p }}
+        <button type="submit">Сменить часовой пояс</button>
+    </form>
+    <h4>Календарь (текст)</h4>
+    <pre>{{ text_calendar }}</pre>
+</section>
+
+<section>
+    <h3>Погода (OpenWeatherMap) — {{ weather.city }}</h3>
+    {% if weather.ok %}
+        <p>{{ weather.description }}, {{ weather.temperature }} °C</p>
+        <p>Влажность: {{ weather.humidity }}%, ветер: {{ weather.wind_speed }} м/с</p>
+    {% else %}
+        <p>{{ weather.error }}</p>
+    {% endif %}
+</section>
+
+<section>
+    <h3>Курсы валют</h3>
+    {% if exchange.ok %}
+        <p>База: {{ exchange.base }}, дата: {{ exchange.date }}, источники: {{ exchange.sources }}</p>
+        <ul>
+            {% for code, rate in exchange.rates.items %}
+                <li>1 {{ exchange.base }} = {{ rate }} {{ code }}</li>
+            {% endfor %}
+        </ul>
+        {% if price_samples_usd %}
+            <h4>Пример цен медикаментов в USD (курс 1 USD = {{ usd_to_byn }} BYN)</h4>
+            <table border="1" cellpadding="4">
+                <tr><th>Товар</th><th>BYN</th><th>USD</th></tr>
+                {% for s in price_samples_usd %}
+                    <tr>
+                        <td>{{ s.name }}</td>
+                        <td>{{ s.price_byn }}</td>
+                        <td>{{ s.price_usd }}</td>
+                    </tr>
+                {% endfor %}
+            </table>
+        {% endif %}
+    {% else %}
+        <p>{{ exchange.error }}</p>
+    {% endif %}
+</section>
+
+<section>
+    <h3>Статистика продаж</h3>
+    <p><strong>Общая сумма продаж:</strong> {{ stats.total_sales_amount }} BYN</p>
+    <p><strong>Число продаж:</strong> {{ stats.sales_count }}</p>
+    <p><strong>Среднее по сумме продажи:</strong> {{ stats.sales_mean|default:"—" }} BYN</p>
+    <p><strong>Медиана:</strong> {{ stats.sales_median|default:"—" }} BYN</p>
+    <p><strong>Мода:</strong> {{ stats.sales_mode|default:"—" }} BYN</p>
+    <p><strong>Средний возраст покупателей:</strong> {{ stats.customer_age_mean|default:"—" }} лет</p>
+    <p><strong>Медиана возраста покупателей:</strong> {{ stats.customer_age_median|default:"—" }} лет</p>
+    {% if stats.popular_category %}
+        <p><strong>Самая популярная категория:</strong>
+            {{ stats.popular_category.name }} ({{ stats.popular_category.sales_count }} продаж)
+        </p>
+    {% endif %}
+    {% if stats.profitable_category %}
+        <p><strong>Самая прибыльная категория:</strong>
+            {{ stats.profitable_category.name }}
+            ({{ stats.profitable_category.revenue }} BYN)
+        </p>
+    {% endif %}
+</section>
+
+<section>
+    <h3>Медикаменты (алфавит) и даты</h3>
+    <table border="1" cellpadding="4">
+        <thead>
+            <tr>
+                <th>Код</th>
+                <th>Название</th>
+                <th>Цена (BYN)</th>
+                <th>Добавлен (UTC)</th>
+                <th>Добавлен ({{ user_timezone_name }})</th>
+                <th>Изменён (UTC)</th>
+                <th>Изменён ({{ user_timezone_name }})</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for m in medications_dates %}
+                <tr>
+                    <td>{{ m.code }}</td>
+                    <td>{{ m.name }}</td>
+                    <td>{{ m.price }}</td>
+                    <td>{{ m.created_utc }}</td>
+                    <td>{{ m.created_user }}</td>
+                    <td>{{ m.updated_utc }}</td>
+                    <td>{{ m.updated_user }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</section>
+
+<section>
+    <h3>Товары в алфавитном порядке</h3>
+    <ol>
+        {% for med in stats.medications_alpha %}
+            <li>{{ med.name }} ({{ med.code }}) — {{ med.price }} BYN</li>
+        {% empty %}
+            <li>Нет товаров.</li>
+        {% endfor %}
+    </ol>
+</section>
+
+<section>
+    <h3>Категории: продажи и выручка</h3>
+    <table border="1" cellpadding="4">
+        <tr><th>Категория</th><th>Продаж</th><th>Выручка</th></tr>
+        {% for row in stats.categories_breakdown %}
+            <tr>
+                <td>{{ row.name }}</td>
+                <td>{{ row.sales_count }}</td>
+                <td>{{ row.revenue|default:"0" }} BYN</td>
+            </tr>
+        {% empty %}
+            <tr><td colspan="3">Нет данных</td></tr>
+        {% endfor %}
+    </table>
+</section>
+
+<section>
+    <h3>Графики (matplotlib)</h3>
+    <p><img src="{{ chart_sales_url }}" alt="Продажи по датам" width="700"></p>
+    <p><img src="{{ chart_categories_url }}" alt="Популярность категорий" width="700"></p>
+</section>
+
+<p><a href="{% url 'pharmacy:owner_dashboard' %}">← Панель владельца</a></p>
+{% endblock %}

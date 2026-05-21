@@ -1,0 +1,10 @@
+{% extends 'pharmacy/base.html' %}
+{% block title %}Новый отзыв{% endblock %}
+{% block content %}
+<h2>Добавить отзыв</h2>
+<form method="post" novalidate>
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Отправить</button>
+</form>
+{% endblock %}

@@ -1,0 +1,15 @@
+{% extends 'pharmacy/base.html' %}
+{% block title %}Категории{% endblock %}
+{% block content %}
+<h2>Категории медикаментов</h2>
+<ul>
+    {% for category in categories %}
+        <li>
+            <strong>{{ category.name }}</strong>
+            {% if category.description %} — {{ category.description }}{% endif %}
+        </li>
+    {% empty %}
+        <li>Категории не найдены.</li>
+    {% endfor %}
+</ul>
+{% endblock %}

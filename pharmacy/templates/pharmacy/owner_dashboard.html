@@ -1,0 +1,31 @@
+{% extends 'pharmacy/base.html' %}
+{% block title %}Панель владельца{% endblock %}
+{% block content %}
+<h2>Панель владельца</h2>
+<p><strong>Общая выручка (продажи):</strong> {{ total_revenue }} BYN</p>
+<p><strong>Всего продаж:</strong> {{ sales_count }}</p>
+<p><strong>Медикаментов в каталоге:</strong> {{ medications_count }}</p>
+<h3>Выручка по отделам</h3>
+<table border="1" cellpadding="4">
+    <thead>
+        <tr>
+            <th>Отдел</th>
+            <th>Выручка</th>
+            <th>Кол-во продаж</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for row in revenue_by_department %}
+            <tr>
+                <td>{{ row.employee__department__name }}</td>
+                <td>{{ row.revenue }} BYN</td>
+                <td>{{ row.sales_count }}</td>
+            </tr>
+        {% empty %}
+            <tr><td colspan="3">Нет данных.</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+<p><a href="{% url 'pharmacy:analytics' %}">Аналитика, API и графики</a></p>
+<p>Редактирование данных: <a href="{% url 'admin:index' %}">админ-панель Django</a>.</p>
+{% endblock %}

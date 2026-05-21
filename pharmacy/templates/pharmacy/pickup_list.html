@@ -1,0 +1,17 @@
+{% extends 'pharmacy/base.html' %}
+{% block title %}Самовывоз{% endblock %}
+{% block content %}
+<h2>Точки самовывоза</h2>
+<ul>
+    {% for point in pickup_points %}
+        <li>
+            <strong>{{ point.name }}</strong><br>
+            {{ point.address }}<br>
+            Тел.: {{ point.phone }}<br>
+            Часы: {{ point.working_hours }}
+        </li>
+    {% empty %}
+        <li>Точки не найдены.</li>
+    {% endfor %}
+</ul>
+{% endblock %}

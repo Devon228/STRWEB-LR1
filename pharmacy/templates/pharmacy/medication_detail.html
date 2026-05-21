@@ -1,0 +1,28 @@
+{% extends 'pharmacy/base.html' %}
+{% block title %}{{ medication.name }}{% endblock %}
+{% block content %}
+<h2>{{ medication.name }} ({{ medication.code }})</h2>
+{% if medication.photo %}
+    <p><img src="{{ medication.photo.url }}" alt="{{ medication.name }}" width="300"></p>
+{% endif %}
+<p><strong>Цена:</strong> {{ medication.price }} BYN</p>
+<p><strong>В наличии:</strong> {% if medication.is_available %}да{% else %}нет{% endif %}</p>
+<p><strong>Категории:</strong>
+    {% for c in medication.categories.all %}{{ c.name }}{% if not forloop.last %}, {% endif %}{% empty %}—{% endfor %}
+</p>
+<p><strong>Инструкция:</strong> {{ medication.instruction|linebreaks }}</p>
+<p><strong>Описание:</strong> {{ medication.description|linebreaks }}</p>
+
+{% if is_owner %}
+    <p>
+        <a href="{% url 'pharmacy:medication_edit' medication.code %}">Изменить</a> |
+        <a href="{% url 'pharmacy:medication_delete' medication.code %}">Удалить</a>
+    </p>
+{% endif %}
+{% if can_buy %}
+    <p><a href="{% url 'pharmacy:purchase_create' medication.code %}">Купить</a></p>
+{% elif user_role == 'anonymous' %}
+    <p><em>Для покупки <a href="{% url 'pharmacy:register' %}">зарегистрируйтесь</a> как покупатель.</em></p>
+{% endif %}
+<p><a href="{% url 'pharmacy:medication_list' %}">← К списку</a></p>
+{% endblock %}

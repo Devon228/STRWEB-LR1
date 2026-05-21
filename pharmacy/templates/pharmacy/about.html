@@ -1,0 +1,25 @@
+{% extends 'pharmacy/base.html' %}
+{% block title %}О компании{% endblock %}
+{% block content %}
+<h2>О компании</h2>
+{% if company %}
+    <h3>{{ company.title }}</h3>
+    <p>{{ company.about_text|linebreaks }}</p>
+    {% if company.history %}
+        <h4>История</h4>
+        <pre>{{ company.history }}</pre>
+    {% endif %}
+    {% if company.requisites %}
+        <h4>Реквизиты</h4>
+        <pre>{{ company.requisites }}</pre>
+    {% endif %}
+    {% if company.video_url %}
+        <p>Видео: <a href="{{ company.video_url }}">{{ company.video_url }}</a></p>
+    {% endif %}
+    {% if company.logo %}
+        <p><img src="{{ company.logo.url }}" alt="Логотип" width="200"></p>
+    {% endif %}
+{% else %}
+    <p>Информация о компании пока не добавлена.</p>
+{% endif %}
+{% endblock %}

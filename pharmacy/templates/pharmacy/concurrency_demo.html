@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Демонстрация Asyncio — подгрузка текстур</title>
+</head>
+<body>
+    <h1>Демонстрация Задача В (Asyncio): Асинхронная подгрузка текстур с сервера во время игры</h1>
+
+    <p>Изолированная симуляция игрового движка: {{ texture_count }} текстур загружаются конкурентно через <code>asyncio.gather()</code>.</p>
+
+    <h2>Лог загрузки</h2>
+    <table border="1" cellpadding="4" cellspacing="0">
+        <thead>
+            <tr>
+                <th>№</th>
+                <th>Текстура</th>
+                <th>Размер (МБ)</th>
+                <th>Задача asyncio</th>
+                <th>Старт</th>
+                <th>Окончание</th>
+                <th>Время (сек)</th>
+                <th>Статус</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in textures %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td>{{ item.name }}</td>
+                    <td>{{ item.size_mb }}</td>
+                    <td>{{ item.task_id }}</td>
+                    <td>{{ item.started_at }}</td>
+                    <td>{{ item.finished_at }}</td>
+                    <td>{{ item.duration_sec }}</td>
+                    <td>{{ item.status }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <h2>Итоговая аналитика</h2>
+    <ul>
+        <li>Общее время асинхронной загрузки: <strong>{{ async_time_sec }}</strong> сек.</li>
+        <li>Время последовательной загрузки (сумма всех задержек): <strong>{{ sequential_time_sec }}</strong> сек.</li>
+        <li>Сэкономлено времени: <strong>{{ time_saved_sec }}</strong> сек.</li>
+        <li>Эффективность: <strong>+{{ efficiency_percent }}%</strong></li>
+    </ul>
+
+    <p>
+        <a href="{% url 'pharmacy:home' %}">На главную</a>
+    </p>
+</body>
+</html>

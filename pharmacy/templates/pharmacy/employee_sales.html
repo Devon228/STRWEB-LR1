@@ -1,0 +1,27 @@
+{% extends 'pharmacy/base.html' %}
+{% block title %}Мои продажи{% endblock %}
+{% block content %}
+<h2>Продажи сотрудника</h2>
+<table border="1" cellpadding="4">
+    <thead>
+        <tr>
+            <th>Дата</th>
+            <th>Медикамент</th>
+            <th>Кол-во</th>
+            <th>Сумма</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for sale in sales %}
+            <tr>
+                <td>{{ sale.sold_at|date:"d/m/Y H:i" }}</td>
+                <td>{{ sale.medication.name }} ({{ sale.medication.code }})</td>
+                <td>{{ sale.quantity }}</td>
+                <td>{{ sale.total_amount }} BYN</td>
+            </tr>
+        {% empty %}
+            <tr><td colspan="4">Продаж нет.</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

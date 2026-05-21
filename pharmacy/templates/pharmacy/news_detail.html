@@ -1,0 +1,12 @@
+{% extends 'pharmacy/base.html' %}
+{% block title %}{{ article.title }}{% endblock %}
+{% block content %}
+<h2>{{ article.title }}</h2>
+<p><small>{{ article.published_at|date:"d/m/Y H:i" }}</small></p>
+{% if article.image %}
+    <p><img src="{{ article.image.url }}" alt="{{ article.title }}" width="400"></p>
+{% endif %}
+<p><em>{{ article.summary }}</em></p>
+<div>{{ article.content|linebreaks }}</div>
+<p><a href="{% url 'pharmacy:news_list' %}">← К списку новостей</a></p>
+{% endblock %}

@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Аптека{% endblock %}</title>
+    {% block extra_styles %}{% endblock %}
+</head>
+<body>
+    <header class="site-header">
+        <h1>Аптека «Здоровье+»</h1>
+        <p>Роль: <strong>{{ current_role_label }}</strong>
+            {% if user.is_authenticated %}({{ user.username }}){% endif %}
+        </p>
+        <nav class="site-nav">
+            <a href="{% url 'pharmacy:home' %}">Главная</a> |
+            <a href="{% url 'pharmacy:about' %}">О компании</a> |
+            <a href="{% url 'pharmacy:news_list' %}">Новости</a> |
+            <a href="{% url 'pharmacy:glossary_list' %}">Словарь</a> |
+            <a href="{% url 'pharmacy:contact_list' %}">Контакты</a> |
+            <a href="{% url 'pharmacy:vacancy_list' %}">Вакансии</a> |
+            <a href="{% url 'pharmacy:privacy' %}">Конфиденциальность</a> |
+            <a href="{% url 'pharmacy:category_list' %}">Категории</a> |
+            <a href="{% url 'pharmacy:medication_list' %}">Медикаменты</a> |
+            <a href="{% url 'pharmacy:promo_list' %}">Промокоды</a> |
+            <a href="{% url 'pharmacy:service_list' %}">Доп. услуги</a> |
+            <a href="{% url 'pharmacy:review_list' %}">Отзывы</a>
+            {% if current_role == 'customer' %}
+                | <a href="{% url 'pharmacy:pickup_list' %}">Самовывоз</a>
+                | <a href="{% url 'pharmacy:purchase_list' %}">Мои покупки</a>
+            {% endif %}
+            {% if current_role == 'employee' %}
+                | <a href="{% url 'pharmacy:employee_sales' %}">Мои продажи</a>
+                | <a href="{% url 'pharmacy:employee_suppliers' %}">Мои поставщики</a>
+            {% endif %}
+            {% if current_role == 'owner' %}
+                | <a href="{% url 'pharmacy:owner_dashboard' %}">Панель владельца</a>
+                | <a href="{% url 'pharmacy:analytics' %}">Аналитика</a>
+                | <a href="{% url 'pharmacy:medication_create' %}">+ Медикамент</a>
+                | <a href="{% url 'admin:index' %}">Админка Django</a>
+            {% endif %}
+            {% if user.is_authenticated %}
+                | <form method="post" action="{% url 'pharmacy:logout' %}" style="display:inline">
+                    {% csrf_token %}
+                    <button type="submit">Выход</button>
+                </form>
+            {% else %}
+                | <a href="{% url 'pharmacy:login' %}">Вход</a>
+                | <a href="{% url 'pharmacy:register' %}">Регистрация</a>
+            {% endif %}
+        </nav>
+        <hr>
+    </header>
+    {% block weather_widget %}{% endblock %}
+
+    {% if messages %}
+        <ul>
+            {% for message in messages %}
+                <li>{{ message }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+</body>
+</html>
