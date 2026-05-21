@@ -63,6 +63,16 @@ urlpatterns = [
         views.EmployeeSupplierListView.as_view(),
         name='employee_suppliers',
     ),
+    re_path(
+        r'^employee/purchases/$',
+        views.StaffPurchaseListView.as_view(),
+        name='staff_purchase_list',
+    ),
+    re_path(
+        r'^employee/purchases/add/$',
+        views.StaffPurchaseCreateView.as_view(),
+        name='staff_purchase_create',
+    ),
     re_path(r'^owner/$', views.OwnerDashboardView.as_view(), name='owner_dashboard'),
     re_path(r'^analytics/$', views.AnalyticsView.as_view(), name='analytics'),
     re_path(

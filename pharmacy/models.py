@@ -5,7 +5,11 @@ from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.utils import timezone
 
-from pharmacy.validators import validate_adult_age, validate_belarus_phone
+from pharmacy.validators import (
+    validate_adult_age,
+    validate_belarus_phone,
+    validate_not_future_datetime,
+)
 
 
 class TimeStampedModel(models.Model):
@@ -295,7 +299,11 @@ class Purchase(TimeStampedModel):
         decimal_places=2,
         validators=[MinValueValidator(Decimal('0.01'))],
     )
-    purchased_at = models.DateTimeField('Дата покупки', default=timezone.now)
+    purchased_at = models.DateTimeField(
+        'Дата покупки',
+        default=timezone.now,
+        validators=[validate_not_future_datetime],
+    )
 
     class Meta:
         verbose_name = 'Покупка'
@@ -385,6 +393,14 @@ class ContactPerson(TimeStampedModel):
 
     def __str__(self):
         return self.full_name
+
+    @property
+    def display_photo_url(self):
+        if self.photo:
+            return self.photo.url
+        from pharmacy.services.contact_images import external_contact_photo_url
+
+        return external_contact_photo_url(self.pk)
 
 
 class Vacancy(TimeStampedModel):

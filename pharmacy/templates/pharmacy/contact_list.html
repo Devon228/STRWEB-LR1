@@ -4,10 +4,8 @@
 <h2>Контакты</h2>
 {% for contact in contacts %}
     <section>
+        {% include 'pharmacy/includes/contact_photo.html' with contact=contact %}
         <h3>{{ contact.full_name }}</h3>
-        {% if contact.photo %}
-            <p><img src="{{ contact.photo.url }}" alt="{{ contact.full_name }}" width="150"></p>
-        {% endif %}
         <p>{{ contact.job_description|linebreaks }}</p>
         <p>Тел.: {{ contact.phone }}</p>
         <p>Email: <a href="mailto:{{ contact.email }}">{{ contact.email }}</a></p>

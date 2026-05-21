@@ -1,10 +1,13 @@
 import pytest
+from datetime import timedelta
+
 from django.conf import settings
 from django.urls import reverse
+from django.utils import timezone
 
 from asgiref.sync import async_to_sync
 from pharmacy.concurrency import load_game_assets
-from pharmacy.models import Article
+from pharmacy.models import Article, ContactPerson
 
 
 @pytest.mark.django_db
@@ -34,6 +37,80 @@ def test_home_shows_timezone_and_article_image(client):
     assert 'user_now' not in content
     assert article.display_image_url in content
     assert '<img' in content
+
+
+@pytest.mark.django_db
+def test_staff_purchase_create_rejects_future_date(
+    client,
+    employee_user,
+    customer_user,
+    medication,
+    pickup_point,
+):
+    client.force_login(employee_user)
+    future = timezone.now() + timedelta(days=2)
+    response = client.post(
+        reverse('pharmacy:staff_purchase_create'),
+        {
+            'customer': customer_user.customer_profile.pk,
+            'medication': medication.pk,
+            'pickup_point': pickup_point.pk,
+            'quantity': 1,
+            'purchased_at': future.strftime('%Y-%m-%dT%H:%M'),
+        },
+    )
+    assert response.status_code == 200
+    assert 'будущем' in response.content.decode()
+
+
+@pytest.mark.django_db
+def test_staff_purchase_create_success(
+    client,
+    employee_user,
+    customer_user,
+    medication,
+    pickup_point,
+):
+    client.force_login(employee_user)
+    local_past = timezone.localtime(timezone.now()) - timedelta(hours=1)
+    response = client.post(
+        reverse('pharmacy:staff_purchase_create'),
+        {
+            'customer': customer_user.customer_profile.pk,
+            'medication': medication.pk,
+            'pickup_point': pickup_point.pk,
+            'quantity': 2,
+            'purchased_at': local_past.strftime('%Y-%m-%dT%H:%M'),
+        },
+    )
+    assert response.status_code == 302
+    from pharmacy.models import Purchase
+
+    purchase = Purchase.objects.latest('pk')
+    assert purchase.quantity == 2
+    expected = timezone.make_aware(
+        local_past.replace(tzinfo=None),
+        timezone.get_current_timezone(),
+    )
+    assert purchase.purchased_at.replace(second=0, microsecond=0) == expected.replace(
+        second=0,
+        microsecond=0,
+    )
+
+
+@pytest.mark.django_db
+def test_contact_list_shows_photo_for_each(client):
+    for i in range(10):
+        ContactPerson.objects.create(
+            full_name=f'Контакт {i}',
+            job_description='Консультации клиентов.',
+            phone=f'+375 (29) {100 + i:03d}-{10 + i:02d}-{10 + i:02d}',
+            email=f'contact{i}@example.by',
+        )
+    response = client.get(reverse('pharmacy:contact_list'))
+    content = response.content.decode()
+    assert response.status_code == 200
+    assert content.count('<img') == 10
 
 
 @pytest.mark.django_db

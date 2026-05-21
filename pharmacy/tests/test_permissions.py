@@ -12,6 +12,8 @@ from django.urls import reverse
         ('pharmacy:owner_dashboard', 302, 403, 403, 200),
         ('pharmacy:analytics', 302, 403, 403, 200),
         ('pharmacy:medication_create', 302, 403, 403, 200),
+        ('pharmacy:staff_purchase_list', 302, 403, 200, 200),
+        ('pharmacy:staff_purchase_create', 302, 403, 200, 200),
     ],
 )
 def test_role_access_urls(

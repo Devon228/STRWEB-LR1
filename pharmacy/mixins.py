@@ -29,3 +29,9 @@ class EmployeeRequiredMixin(RoleRequiredMixin):
 
 class OwnerRequiredMixin(RoleRequiredMixin):
     allowed_roles = (Role.OWNER,)
+
+
+class StaffRequiredMixin(RoleRequiredMixin):
+    """Сотрудник аптеки или владелец (superuser)."""
+
+    allowed_roles = (Role.EMPLOYEE, Role.OWNER)

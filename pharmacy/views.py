@@ -27,11 +27,13 @@ from pharmacy.forms import (
     PurchaseForm,
     RegistrationForm,
     ReviewForm,
+    StaffPurchaseForm,
 )
 from pharmacy.mixins import (
     CustomerRequiredMixin,
     EmployeeRequiredMixin,
     OwnerRequiredMixin,
+    StaffRequiredMixin,
 )
 from pharmacy.models import (
     AdditionalService,
@@ -425,6 +427,50 @@ class EmployeeSupplierListView(EmployeeRequiredMixin, TemplateView):
         context = super().get_context_data(**kwargs)
         context['suppliers'] = self.request.user.employee_profile.suppliers.all()
         return context
+
+
+class StaffPurchaseListView(StaffRequiredMixin, ListView):
+    model = Purchase
+    template_name = 'pharmacy/staff_purchase_list.html'
+    context_object_name = 'purchases'
+    paginate_by = 20
+
+    def get_queryset(self):
+        return Purchase.objects.select_related(
+            'customer__user',
+            'medication',
+            'pickup_point',
+        )
+
+
+class StaffPurchaseCreateView(StaffRequiredMixin, CreateView):
+    model = Purchase
+    form_class = StaffPurchaseForm
+    template_name = 'pharmacy/staff_purchase_form.html'
+
+    def get_initial(self):
+        from django.utils import timezone
+
+        return {'purchased_at': timezone.localtime(timezone.now())}
+
+    def get_success_url(self):
+        messages.success(self.request, 'Заказ добавлен.')
+        return reverse('pharmacy:staff_purchase_list')
+
+    def form_valid(self, form):
+        purchase = form.save()
+        log_purchase(
+            self.request.user.username,
+            purchase.medication.code,
+            purchase.quantity,
+            purchase.total_amount,
+            self.request,
+        )
+        return redirect(self.get_success_url())
+
+    def form_invalid(self, form):
+        log_validation_error('staff_purchase', form.errors, self.request)
+        return super().form_invalid(form)
 
 
 class OwnerDashboardView(OwnerRequiredMixin, TemplateView):

@@ -2,11 +2,13 @@ from datetime import date
 
 from django import forms
 from django.contrib.auth import get_user_model
+from django.utils import timezone
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from django.contrib.auth.models import Group
 from django.core.exceptions import ValidationError
 
 from pharmacy.models import (
+    Customer,
     Employee,
     Medication,
     MedicationCategory,
@@ -17,7 +19,11 @@ from pharmacy.models import (
     Supplier,
 )
 from pharmacy.roles import GROUP_CUSTOMER, GROUP_EMPLOYEE, Role, ensure_role_groups
-from pharmacy.validators import validate_adult_age, validate_belarus_phone
+from pharmacy.validators import (
+    validate_adult_age,
+    validate_belarus_phone,
+    validate_not_future_datetime,
+)
 
 User = get_user_model()
 
@@ -261,6 +267,68 @@ class PurchaseForm(forms.ModelForm):
         purchase.customer = self.customer
         purchase.medication = self.medication
         purchase.total_amount = self.medication.price * purchase.quantity
+        if commit:
+            purchase.save()
+        return purchase
+
+
+class StaffPurchaseForm(forms.ModelForm):
+    """Оформление заказа сотрудником с указанием даты покупки."""
+
+    purchased_at = forms.DateTimeField(
+        label='Дата покупки',
+        input_formats=['%Y-%m-%dT%H:%M', '%d/%m/%Y %H:%M', '%d.%m.%Y %H:%M'],
+        widget=forms.DateTimeInput(
+            attrs={'type': 'datetime-local', 'required': 'required'},
+            format='%Y-%m-%dT%H:%M',
+        ),
+        validators=[validate_not_future_datetime],
+    )
+    customer = forms.ModelChoiceField(
+        label='Покупатель',
+        queryset=Customer.objects.select_related('user').order_by('user__username'),
+    )
+    medication = forms.ModelChoiceField(
+        label='Медикамент',
+        queryset=Medication.objects.filter(is_available=True).order_by('name'),
+    )
+    pickup_point = forms.ModelChoiceField(
+        label='Точка самовывоза',
+        queryset=PickupPoint.objects.filter(is_active=True),
+    )
+    quantity = forms.IntegerField(label='Количество', min_value=1, initial=1)
+
+    class Meta:
+        model = Purchase
+        fields = (
+            'customer',
+            'medication',
+            'pickup_point',
+            'quantity',
+            'purchased_at',
+        )
+
+    def clean_purchased_at(self):
+        purchased_at = self.cleaned_data['purchased_at']
+        if timezone.is_naive(purchased_at):
+            purchased_at = timezone.make_aware(
+                purchased_at,
+                timezone.get_current_timezone(),
+            )
+        validate_not_future_datetime(purchased_at)
+        return purchased_at
+
+    def clean(self):
+        cleaned = super().clean()
+        medication = cleaned.get('medication')
+        quantity = cleaned.get('quantity')
+        if medication and quantity and not medication.is_available:
+            raise ValidationError('Медикамент недоступен для покупки.')
+        return cleaned
+
+    def save(self, commit=True):
+        purchase = super().save(commit=False)
+        purchase.total_amount = purchase.medication.price * purchase.quantity
         if commit:
             purchase.save()
         return purchase

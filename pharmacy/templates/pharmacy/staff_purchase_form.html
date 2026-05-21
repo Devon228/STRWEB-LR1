@@ -1,0 +1,12 @@
+{% extends 'pharmacy/base.html' %}
+{% block title %}Новый заказ{% endblock %}
+{% block content %}
+<h2>Добавить заказ</h2>
+<p>Дата покупки не может быть в будущем (включая завтра).</p>
+<form method="post" novalidate>
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Сохранить</button>
+    <a href="{% url 'pharmacy:staff_purchase_list' %}">Отмена</a>
+</form>
+{% endblock %}

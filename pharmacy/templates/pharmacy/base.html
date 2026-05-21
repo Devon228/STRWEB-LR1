@@ -31,8 +31,10 @@
             {% if current_role == 'employee' %}
                 | <a href="{% url 'pharmacy:employee_sales' %}">Мои продажи</a>
                 | <a href="{% url 'pharmacy:employee_suppliers' %}">Мои поставщики</a>
+                | <a href="{% url 'pharmacy:staff_purchase_list' %}">Заказы</a>
             {% endif %}
             {% if current_role == 'owner' %}
+                | <a href="{% url 'pharmacy:staff_purchase_list' %}">Заказы</a>
                 | <a href="{% url 'pharmacy:owner_dashboard' %}">Панель владельца</a>
                 | <a href="{% url 'pharmacy:analytics' %}">Аналитика</a>
                 | <a href="{% url 'pharmacy:medication_create' %}">+ Медикамент</a>

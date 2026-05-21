@@ -4,7 +4,13 @@ from unittest.mock import patch
 import pytest
 from django.core.exceptions import ValidationError
 
-from pharmacy.validators import validate_adult_age, validate_belarus_phone
+from django.utils import timezone
+
+from pharmacy.validators import (
+    validate_adult_age,
+    validate_belarus_phone,
+    validate_not_future_datetime,
+)
 
 FROZEN_TODAY = date(2026, 5, 21)
 
@@ -50,3 +56,16 @@ def test_validate_adult_age(birth_date, should_raise, label):
             assert exc.value.code == 'underage'
         else:
             validate_adult_age(birth_date)
+
+
+@pytest.mark.django_db
+def test_validate_not_future_datetime_rejects_tomorrow():
+    tomorrow = timezone.now() + timezone.timedelta(days=1)
+    with pytest.raises(ValidationError) as exc:
+        validate_not_future_datetime(tomorrow)
+    assert exc.value.code == 'future_datetime'
+
+
+@pytest.mark.django_db
+def test_validate_not_future_datetime_accepts_now():
+    validate_not_future_datetime(timezone.now())
