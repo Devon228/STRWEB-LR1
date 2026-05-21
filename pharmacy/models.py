@@ -326,6 +326,14 @@ class Article(TimeStampedModel):
     def __str__(self):
         return self.title
 
+    @property
+    def display_image_url(self):
+        if self.image:
+            return self.image.url
+        from pharmacy.services.article_images import external_article_image_url
+
+        return external_article_image_url(self.pk)
+
 
 class CompanyInfo(TimeStampedModel):
     title = models.CharField('Заголовок', max_length=200, default='О компании')

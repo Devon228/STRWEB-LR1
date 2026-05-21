@@ -6,8 +6,9 @@
 
 <section>
     <h3>Дата и часовой пояс</h3>
-    <p><strong>Ваш пояс:</strong> {{ user_timezone_name }}</p>
-    <p><strong>Сегодня:</strong> {{ weekday_name }}, {{ current_date_user }} (локально)</p>
+    <p><strong>Ваш пояс:</strong> {{ user_timezone }}</p>
+    <p><strong>Сейчас:</strong> {{ user_now|date:"d/m/Y H:i" }} ({{ weekday_name }})</p>
+    <p><strong>Сегодня:</strong> {{ current_date_user }}</p>
     <p><strong>UTC:</strong> {{ current_date_utc }}</p>
     <p><strong>Локальное время:</strong> {{ current_datetime_user }}</p>
     <form method="post">
@@ -87,9 +88,9 @@
                 <th>Название</th>
                 <th>Цена (BYN)</th>
                 <th>Добавлен (UTC)</th>
-                <th>Добавлен ({{ user_timezone_name }})</th>
+                <th>Добавлен ({{ user_timezone }})</th>
                 <th>Изменён (UTC)</th>
-                <th>Изменён ({{ user_timezone_name }})</th>
+                <th>Изменён ({{ user_timezone }})</th>
             </tr>
         </thead>
         <tbody>

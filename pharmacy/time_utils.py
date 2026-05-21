@@ -98,16 +98,19 @@ def build_text_calendar(year, month, tz=None):
 
 
 def current_moment_context(request):
+    """Контекст аналитики: даты через django.utils.timezone."""
     user_tz = get_session_timezone(request)
     utc_tz = ZoneInfo('UTC')
     now_utc = dj_timezone.now().astimezone(utc_tz)
-    now_user = now_utc.astimezone(user_tz)
+    now_user = dj_timezone.localtime(dj_timezone.now())
     local_today = now_user.date()
     return {
+        'user_timezone': str(user_tz),
         'user_timezone_name': str(user_tz),
+        'user_now': now_user,
         'current_date_utc': format_date_dd_mm_yyyy(now_utc, utc_tz),
         'current_date_user': format_date_dd_mm_yyyy(now_user, user_tz),
-        'current_datetime_user': format_datetime_dd_mm_yyyy_hm(now_user, user_tz),
+        'current_datetime_user': format_datetime_dd_mm_yyyy_hm(now_user),
         'text_calendar': build_text_calendar(
             local_today.year,
             local_today.month,

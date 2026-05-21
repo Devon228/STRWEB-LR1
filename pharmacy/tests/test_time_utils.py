@@ -34,3 +34,12 @@ def test_build_text_calendar_contains_month():
     text = build_text_calendar(2026, 5)
     assert 'Май' in text
     assert '2026' in text
+
+
+def test_article_display_image_url_external():
+    from pharmacy.models import Article
+    from pharmacy.services.article_images import external_article_image_url
+
+    article = Article(pk=7, title='t', summary='s')
+    assert article.display_image_url == external_article_image_url(7)
+    assert 'pharmacy' in article.display_image_url

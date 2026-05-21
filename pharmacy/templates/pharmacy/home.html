@@ -7,11 +7,13 @@
 {% endblock %}
 {% block content %}
 <h2>Главная</h2>
+<p><small>Часовой пояс: {{ user_timezone }} | Сейчас: {{ user_now|date:"d/m/Y H:i" }}</small></p>
 {% if latest_article %}
     <h3>Последняя новость</h3>
+    {% include 'pharmacy/includes/article_image.html' with article=latest_article %}
     <p><strong>{{ latest_article.title }}</strong></p>
     <p>{{ latest_article.summary }}</p>
-    <p>Опубликовано: {{ latest_article.published_at|date:"d/m/Y" }}</p>
+    <p>Опубликовано: {{ latest_article.published_at|date:"d/m/Y H:i" }}</p>
     <p><a href="{% url 'pharmacy:news_detail' latest_article.pk %}">Читать далее</a></p>
 {% else %}
     <p>Новостей пока нет.</p>

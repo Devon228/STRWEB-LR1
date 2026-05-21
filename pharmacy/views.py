@@ -4,6 +4,7 @@ from zoneinfo import ZoneInfo
 
 from asgiref.sync import async_to_sync
 from django import forms
+from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import login
 from django.contrib.auth.views import LoginView, LogoutView
@@ -455,7 +456,7 @@ class TimezoneForm(forms.Form):
     def __init__(self, *args, current_tz=None, **kwargs):
         super().__init__(*args, **kwargs)
         popular = [
-            'Europe/Minsk',
+            settings.TIME_ZONE,
             'UTC',
             'Europe/Moscow',
             'Europe/Warsaw',
@@ -474,7 +475,7 @@ class AnalyticsView(OwnerRequiredMixin, TemplateView):
     template_name = 'pharmacy/analytics.html'
 
     def post(self, request, *args, **kwargs):
-        tz = request.POST.get('user_timezone', 'Europe/Minsk')
+        tz = request.POST.get('user_timezone', settings.TIME_ZONE)
         if tz:
             request.session['user_timezone'] = tz
             messages.success(request, f'Часовой пояс: {tz}')
