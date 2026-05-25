@@ -33,7 +33,7 @@ def _fetch_usd_byn_nbrb():
 
 def _fetch_usd_byn_fallback():
     """Резервный курс USD→BYN (exchangerate-api.com)."""
-    response = requests.get(EXCHANGERATE_API_URL, timeout=10)
+    response = requests.get(EXCHANGERATE_API_URL, timeout=3)
     response.raise_for_status()
     data = response.json()
     return Decimal(str(data['rates']['BYN'])), data.get('date', '')
