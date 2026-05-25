@@ -27,10 +27,12 @@ from pharmacy.forms import (
     PurchaseForm,
     RegistrationForm,
     ReviewForm,
+    EmployeeSaleForm,
     StaffPurchaseForm,
 )
 from pharmacy.mixins import (
     CustomerRequiredMixin,
+    EmployeeOrOwnerRequiredMixin,
     EmployeeRequiredMixin,
     OwnerRequiredMixin,
     StaffRequiredMixin,
@@ -54,7 +56,7 @@ from pharmacy.charts import (
     generate_category_popularity_chart,
     generate_sales_by_date_chart,
 )
-from pharmacy.audit_log import log_purchase, log_validation_error
+from pharmacy.audit_log import log_purchase, log_sale, log_validation_error
 from pharmacy.concurrency import load_game_assets
 from pharmacy.roles import Role, get_user_role
 from pharmacy.services.currency import fetch_exchange_rates
@@ -409,15 +411,64 @@ class PurchaseCreateView(CustomerRequiredMixin, CreateView):
         return redirect(self.get_success_url())
 
 
-class EmployeeSaleListView(EmployeeRequiredMixin, ListView):
+class EmployeeSaleListView(EmployeeOrOwnerRequiredMixin, ListView):
     model = Sale
     template_name = 'pharmacy/employee_sales.html'
     context_object_name = 'sales'
 
     def get_queryset(self):
-        return Sale.objects.filter(
-            employee=self.request.user.employee_profile,
-        ).select_related('medication', 'employee')
+        qs = Sale.objects.select_related(
+            'medication',
+            'employee',
+            'employee__user',
+        )
+        if get_user_role(self.request.user) == Role.OWNER:
+            return qs
+        return qs.filter(employee=self.request.user.employee_profile)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['is_all_sales'] = get_user_role(self.request.user) == Role.OWNER
+        return context
+
+
+class EmployeeSaleCreateView(EmployeeOrOwnerRequiredMixin, CreateView):
+    model = Sale
+    form_class = EmployeeSaleForm
+    template_name = 'pharmacy/employee_sale_form.html'
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        role = get_user_role(self.request.user)
+        if role == Role.EMPLOYEE:
+            kwargs['employee'] = self.request.user.employee_profile
+        elif role == Role.OWNER:
+            kwargs['owner_picks_employee'] = True
+        return kwargs
+
+    def get_initial(self):
+        from django.utils import timezone
+
+        return {'sold_at': timezone.localtime(timezone.now())}
+
+    def get_success_url(self):
+        messages.success(self.request, 'Продажа добавлена.')
+        return reverse('pharmacy:employee_sales')
+
+    def form_valid(self, form):
+        sale = form.save()
+        log_sale(
+            self.request.user.username,
+            sale.medication.code,
+            sale.quantity,
+            sale.total_amount,
+            self.request,
+        )
+        return redirect(self.get_success_url())
+
+    def form_invalid(self, form):
+        log_validation_error('employee_sale', form.errors, self.request)
+        return super().form_invalid(form)
 
 
 class EmployeeSupplierListView(EmployeeRequiredMixin, TemplateView):

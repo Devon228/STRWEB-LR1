@@ -30,6 +30,22 @@ def test_registration_form_phone(phone, valid, department):
 
 
 @pytest.mark.django_db
+def test_registration_form_age_shows_field_error(department):
+    ensure_groups()
+    data = _base_registration_data(
+        department,
+        birth_date=date(2008, 6, 21).isoformat(),
+        username='age_under',
+    )
+    form = RegistrationForm(data=data)
+    with patch('pharmacy.validators.date') as mock_date:
+        mock_date.today.return_value = FROZEN_TODAY
+        assert not form.is_valid()
+        assert 'birth_date' in form.errors
+        assert any('18' in msg for msg in form.errors['birth_date'])
+
+
+@pytest.mark.django_db
 @pytest.mark.parametrize(
     'birth_date,valid,label',
     [

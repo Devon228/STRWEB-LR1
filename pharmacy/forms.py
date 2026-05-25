@@ -16,6 +16,7 @@ from pharmacy.models import (
     PickupPoint,
     Purchase,
     Review,
+    Sale,
     Supplier,
 )
 from pharmacy.roles import GROUP_CUSTOMER, GROUP_EMPLOYEE, Role, ensure_role_groups
@@ -30,11 +31,6 @@ User = get_user_model()
 PHONE_HTML_PATTERN = r'\+375 \(29\) [0-9]{3}-[0-9]{2}-[0-9]{2}'
 PHONE_PLACEHOLDER = '+375 (29) XXX-XX-XX'
 PHONE_TITLE = 'Формат: +375 (29) XXX-XX-XX'
-
-
-def max_birth_date_adult():
-    today = date.today()
-    return date(today.year - 18, today.month, today.day)
 
 
 class BelarusPhoneField(forms.CharField):
@@ -62,11 +58,14 @@ class AdultBirthDateField(forms.DateField):
     def __init__(self, *args, **kwargs):
         kwargs.setdefault('label', 'Дата рождения')
         kwargs.setdefault(
+            'help_text',
+            'Вам должно быть не менее 18 лет.',
+        )
+        kwargs.setdefault(
             'widget',
             forms.DateInput(
                 attrs={
                     'type': 'date',
-                    'max': max_birth_date_adult().isoformat(),
                     'required': 'required',
                 },
             ),
@@ -75,7 +74,10 @@ class AdultBirthDateField(forms.DateField):
 
     def clean(self, value):
         value = super().clean(value)
-        validate_adult_age(value)
+        try:
+            validate_adult_age(value)
+        except ValidationError as exc:
+            raise ValidationError(exc.messages, code=exc.code) from exc
         return value
 
 
@@ -270,6 +272,71 @@ class PurchaseForm(forms.ModelForm):
         if commit:
             purchase.save()
         return purchase
+
+
+class EmployeeSaleForm(forms.ModelForm):
+    """Продажа в зале — оформляет текущий сотрудник."""
+
+    sold_at = forms.DateTimeField(
+        label='Дата продажи',
+        input_formats=['%Y-%m-%dT%H:%M', '%d/%m/%Y %H:%M', '%d.%m.%Y %H:%M'],
+        widget=forms.DateTimeInput(
+            attrs={'type': 'datetime-local', 'required': 'required'},
+            format='%Y-%m-%dT%H:%M',
+        ),
+        validators=[validate_not_future_datetime],
+    )
+    medication = forms.ModelChoiceField(
+        label='Медикамент',
+        queryset=Medication.objects.filter(is_available=True).order_by('name'),
+    )
+    quantity = forms.IntegerField(label='Количество', min_value=1, initial=1)
+
+    class Meta:
+        model = Sale
+        fields = ('medication', 'quantity', 'sold_at')
+
+    def __init__(self, *args, employee=None, owner_picks_employee=False, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.employee = employee
+        if owner_picks_employee:
+            self.fields['employee'] = forms.ModelChoiceField(
+                label='Сотрудник',
+                queryset=Employee.objects.select_related('user').order_by(
+                    'user__last_name',
+                    'user__first_name',
+                ),
+            )
+
+    def clean_sold_at(self):
+        sold_at = self.cleaned_data['sold_at']
+        if timezone.is_naive(sold_at):
+            sold_at = timezone.make_aware(
+                sold_at,
+                timezone.get_current_timezone(),
+            )
+        validate_not_future_datetime(sold_at)
+        return sold_at
+
+    def clean(self):
+        cleaned = super().clean()
+        medication = cleaned.get('medication')
+        if medication and not medication.is_available:
+            raise ValidationError('Медикамент недоступен для продажи.')
+        if 'employee' in self.fields and not cleaned.get('employee'):
+            self.add_error('employee', 'Выберите сотрудника.')
+        return cleaned
+
+    def save(self, commit=True):
+        sale = super().save(commit=False)
+        if 'employee' in self.fields:
+            sale.employee = self.cleaned_data['employee']
+        else:
+            sale.employee = self.employee
+        sale.total_amount = sale.medication.price * sale.quantity
+        if commit:
+            sale.save()
+        return sale
 
 
 class StaffPurchaseForm(forms.ModelForm):

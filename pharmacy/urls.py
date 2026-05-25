@@ -59,6 +59,11 @@ urlpatterns = [
         name='employee_sales',
     ),
     re_path(
+        r'^employee/sales/add/$',
+        views.EmployeeSaleCreateView.as_view(),
+        name='employee_sale_create',
+    ),
+    re_path(
         r'^employee/suppliers/$',
         views.EmployeeSupplierListView.as_view(),
         name='employee_suppliers',

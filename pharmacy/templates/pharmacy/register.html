@@ -1,12 +1,79 @@
 {% extends 'pharmacy/base.html' %}
 {% block title %}Регистрация{% endblock %}
+{% block extra_styles %}
+<style>
+    .errorlist { color: #b00020; margin: 0.25em 0 0.5em 1.25em; padding: 0; }
+    .errorlist li { list-style: disc; }
+    .helptext { color: #555; font-size: 0.9em; display: block; margin-top: 0.2em; }
+    #department-block { display: none; margin-top: 0.5em; }
+</style>
+{% endblock %}
 {% block content %}
 <h2>Регистрация</h2>
-<form method="post" novalidate>
+<form method="post" novalidate id="registration-form">
     {% csrf_token %}
-    {{ form.as_p }}
+    {% if form.non_field_errors %}
+        <ul class="errorlist">
+            {% for error in form.non_field_errors %}
+                <li>{{ error }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+    {% for field in form %}
+        {% if field.name != 'department' %}
+            <p>
+                {{ field.label_tag }}
+                {{ field }}
+                {% if field.help_text %}
+                    <span class="helptext">{{ field.help_text }}</span>
+                {% endif %}
+                {% if field.errors %}
+                    <ul class="errorlist">
+                        {% for error in field.errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            </p>
+        {% endif %}
+    {% endfor %}
+
+    <div id="department-block">
+        <p>
+            {{ form.department.label_tag }}
+            {{ form.department }}
+            {% if form.department.errors %}
+                <ul class="errorlist">
+                    {% for error in form.department.errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        </p>
+    </div>
+
     <p><small>Телефон: {{ form.phone.field.widget.attrs.title }}</small></p>
-    <p><small>Возраст: не менее 18 лет (дата рождения не позже max в поле).</small></p>
     <button type="submit">Зарегистрироваться</button>
 </form>
+<script>
+(function () {
+    const block = document.getElementById('department-block');
+    const roleInputs = document.querySelectorAll('input[name="account_role"]');
+    function syncDepartment() {
+        const selected = document.querySelector('input[name="account_role"]:checked');
+        const isEmployee = selected && selected.value === 'employee';
+        block.style.display = isEmployee ? 'block' : 'none';
+        const select = block.querySelector('select');
+        if (select) {
+            select.required = isEmployee;
+            if (!isEmployee) {
+                select.value = '';
+            }
+        }
+    }
+    roleInputs.forEach((input) => input.addEventListener('change', syncDepartment));
+    syncDepartment();
+})();
+</script>
 {% endblock %}

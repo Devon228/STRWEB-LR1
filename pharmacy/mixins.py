@@ -27,6 +27,12 @@ class EmployeeRequiredMixin(RoleRequiredMixin):
     allowed_roles = (Role.EMPLOYEE,)
 
 
+class EmployeeOrOwnerRequiredMixin(RoleRequiredMixin):
+    """Сотрудник или владелец (superuser) — продажи, заказы."""
+
+    allowed_roles = (Role.EMPLOYEE, Role.OWNER)
+
+
 class OwnerRequiredMixin(RoleRequiredMixin):
     allowed_roles = (Role.OWNER,)
 

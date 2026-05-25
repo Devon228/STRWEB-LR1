@@ -1,11 +1,13 @@
 {% extends 'pharmacy/base.html' %}
 {% block title %}Мои продажи{% endblock %}
 {% block content %}
-<h2>Продажи сотрудника</h2>
+<h2>{% if is_all_sales %}Все продажи{% else %}Мои продажи{% endif %}</h2>
+<p><a href="{% url 'pharmacy:employee_sale_create' %}">+ Добавить продажу</a></p>
 <table border="1" cellpadding="4">
     <thead>
         <tr>
             <th>Дата</th>
+            {% if is_all_sales %}<th>Сотрудник</th>{% endif %}
             <th>Медикамент</th>
             <th>Кол-во</th>
             <th>Сумма</th>
@@ -15,12 +17,15 @@
         {% for sale in sales %}
             <tr>
                 <td>{{ sale.sold_at|date:"d/m/Y H:i" }}</td>
+                {% if is_all_sales %}
+                    <td>{{ sale.employee.user.get_full_name|default:sale.employee.user.username }}</td>
+                {% endif %}
                 <td>{{ sale.medication.name }} ({{ sale.medication.code }})</td>
                 <td>{{ sale.quantity }}</td>
                 <td>{{ sale.total_amount }} BYN</td>
             </tr>
         {% empty %}
-            <tr><td colspan="4">Продаж нет.</td></tr>
+            <tr><td colspan="{% if is_all_sales %}5{% else %}4{% endif %}">Продаж нет.</td></tr>
         {% endfor %}
     </tbody>
 </table>

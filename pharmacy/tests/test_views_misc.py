@@ -40,6 +40,40 @@ def test_home_shows_timezone_and_article_image(client):
 
 
 @pytest.mark.django_db
+def test_owner_can_view_sales_list(client, owner_user, sale):
+    client.force_login(owner_user)
+    response = client.get(reverse('pharmacy:employee_sales'))
+    assert response.status_code == 200
+    assert sale.medication.name.encode() in response.content
+
+
+@pytest.mark.django_db
+def test_employee_sale_create_updates_statistics(
+    client,
+    employee_user,
+    medication,
+):
+    from pharmacy.models import Sale
+    from pharmacy.statistics import compute_pharmacy_statistics
+
+    before = Sale.objects.count()
+    client.force_login(employee_user)
+    past = timezone.localtime(timezone.now()) - timedelta(hours=2)
+    response = client.post(
+        reverse('pharmacy:employee_sale_create'),
+        {
+            'medication': medication.pk,
+            'quantity': 3,
+            'sold_at': past.strftime('%Y-%m-%dT%H:%M'),
+        },
+    )
+    assert response.status_code == 302
+    assert Sale.objects.count() == before + 1
+    stats = compute_pharmacy_statistics()
+    assert stats['sales_count'] == Sale.objects.count()
+
+
+@pytest.mark.django_db
 def test_staff_purchase_create_rejects_future_date(
     client,
     employee_user,

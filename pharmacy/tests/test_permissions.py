@@ -8,7 +8,8 @@ from django.urls import reverse
     [
         ('pharmacy:medication_list', 200, 200, 200, 200),
         ('pharmacy:purchase_list', 302, 200, 403, 403),
-        ('pharmacy:employee_sales', 302, 403, 200, 403),
+        ('pharmacy:employee_sales', 302, 403, 200, 200),
+        ('pharmacy:employee_sale_create', 302, 403, 200, 200),
         ('pharmacy:owner_dashboard', 302, 403, 403, 200),
         ('pharmacy:analytics', 302, 403, 403, 200),
         ('pharmacy:medication_create', 302, 403, 403, 200),

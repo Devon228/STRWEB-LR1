@@ -1,0 +1,12 @@
+{% extends 'pharmacy/base.html' %}
+{% block title %}Новая продажа{% endblock %}
+{% block content %}
+<h2>Добавить продажу</h2>
+<p>Учитывается в аналитике. Дата не может быть в будущем.</p>
+<form method="post" novalidate>
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Сохранить</button>
+    <a href="{% url 'pharmacy:employee_sales' %}">Отмена</a>
+</form>
+{% endblock %}

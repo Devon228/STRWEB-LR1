@@ -37,6 +37,17 @@ def log_logout(username, request=None):
     )
 
 
+def log_sale(username, medication_code, quantity, total_amount, request=None):
+    logger.info(
+        'SALE user=%s medication=%s qty=%s total=%s ip=%s',
+        username,
+        medication_code,
+        quantity,
+        total_amount,
+        _client_ip(request),
+    )
+
+
 def log_purchase(username, medication_code, quantity, total_amount, request=None):
     logger.info(
         'PURCHASE user=%s medication=%s qty=%s total=%s ip=%s',
