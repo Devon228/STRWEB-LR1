@@ -72,8 +72,9 @@
     <script>
         (function() {
             var tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+            var url = '{% url "pharmacy:set_timezone" %}';
             if (tz && tz !== '{{ user_timezone }}') {
-                fetch('{% url 'pharmacy:set_timezone' %}?tz=' + encodeURIComponent(tz), {
+                fetch(url + '?tz=' + encodeURIComponent(tz), {
                     credentials: 'same-origin'
                 });
             }
