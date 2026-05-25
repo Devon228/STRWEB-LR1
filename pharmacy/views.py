@@ -1,6 +1,7 @@
 import logging
 from decimal import Decimal
 from zoneinfo import ZoneInfo
+from django.http import HttpResponse
 
 from asgiref.sync import async_to_sync
 from django import forms
@@ -640,3 +641,9 @@ def concurrency_demo_view(request):
         'pharmacy/concurrency_demo.html',
         simulation,
     )
+
+def set_timezone_view(request):
+    tz = request.GET.get('tz') or request.POST.get('tz')
+    if tz:
+        request.session['user_timezone'] = tz
+    return HttpResponse('ok')

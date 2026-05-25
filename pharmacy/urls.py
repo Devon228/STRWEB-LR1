@@ -85,4 +85,5 @@ urlpatterns = [
         views.concurrency_demo_view,
         name='concurrency_demo',
     ),
+    re_path(r'^set-timezone/$', views.set_timezone_view, name='set_timezone'),
 ]

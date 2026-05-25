@@ -68,5 +68,16 @@
     <main>
         {% block content %}{% endblock %}
     </main>
+
+    <script>
+        (function() {
+            var tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+            if (tz && tz !== '{{ user_timezone }}') {
+                fetch('{% url 'pharmacy:set_timezone' %}?tz=' + encodeURIComponent(tz), {
+                    credentials: 'same-origin'
+                });
+            }
+        })();
+    </script>
 </body>
 </html>
