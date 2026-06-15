@@ -1,0 +1,36 @@
+INFO 2026-05-21 09:32:41,524 charts Chart saved: /home/dimas/University/sem_4/IGI/LR5/media/analytics/sales_by_date.png
+INFO 2026-05-21 09:32:41,647 charts Chart saved: /home/dimas/University/sem_4/IGI/LR5/media/analytics/category_popularity.png
+WARNING 2026-05-21 09:33:07,345 currency NBRB API error: HTTPSConnectionPool(host='www.nbrb.by', port=443): Max retries exceeded with url: /api/exrates/rates/USD?parammode=2 (Caused by SSLError(SSLError(1, '[SSL: WRONG_VERSION_NUMBER] wrong version number (_ssl.c:1000)')))
+WARNING 2026-05-21 09:34:28,420 currency NBRB API error: HTTPSConnectionPool(host='www.nbrb.by', port=443): Max retries exceeded with url: /api/exrates/rates/USD?parammode=2 (Caused by SSLError(SSLError(1, '[SSL: WRONG_VERSION_NUMBER] wrong version number (_ssl.c:1000)')))
+WARNING 2026-05-21 09:36:35,022 currency NBRB API error: HTTPSConnectionPool(host='www.nbrb.by', port=443): Max retries exceeded with url: /api/exrates/rates/USD?parammode=2 (Caused by SSLError(SSLError(1, '[SSL: WRONG_VERSION_NUMBER] wrong version number (_ssl.c:1000)')))
+INFO 2026-05-21 09:36:36,808 charts Chart saved: /home/dimas/University/sem_4/IGI/LR5/media/analytics/sales_by_date.png
+INFO 2026-05-21 09:36:36,924 charts Chart saved: /home/dimas/University/sem_4/IGI/LR5/media/analytics/category_popularity.png
+WARNING 2026-05-21 09:44:11,865 weather OpenWeatherMap error: 401 Client Error: Unauthorized for url: https://api.openweathermap.org/data/2.5/weather?q=Minsk&appid=e88847dc22c2cd33c674e25cbe5a5eda&units=metric&lang=ru
+WARNING 2026-05-21 09:44:19,542 currency NBRB API error: HTTPSConnectionPool(host='www.nbrb.by', port=443): Max retries exceeded with url: /api/exrates/rates/USD?parammode=2 (Caused by SSLError(SSLError(1, '[SSL: WRONG_VERSION_NUMBER] wrong version number (_ssl.c:1000)')))
+INFO 2026-05-21 09:44:21,696 charts Chart saved: /home/dimas/University/sem_4/IGI/LR5/media/analytics/sales_by_date.png
+INFO 2026-05-21 09:44:21,811 charts Chart saved: /home/dimas/University/sem_4/IGI/LR5/media/analytics/category_popularity.png
+WARNING 2026-05-21 09:55:49,090 weather OpenWeatherMap error: 401 Client Error: Unauthorized for url: https://api.openweathermap.org/data/2.5/weather?q=Minsk&appid=e88847dc22c2cd33c674e25cbe5a5eda&units=metric&lang=ru
+WARNING 2026-05-21 09:55:56,804 currency NBRB API error: HTTPSConnectionPool(host='www.nbrb.by', port=443): Max retries exceeded with url: /api/exrates/rates/USD?parammode=2 (Caused by SSLError(SSLError(1, '[SSL: WRONG_VERSION_NUMBER] wrong version number (_ssl.c:1000)')))
+INFO 2026-05-21 09:55:59,146 charts Chart saved: /home/dimas/University/sem_4/IGI/LR5/media/analytics/sales_by_date.png
+INFO 2026-05-21 09:55:59,305 charts Chart saved: /home/dimas/University/sem_4/IGI/LR5/media/analytics/category_popularity.png
+WARNING 2026-05-21 09:56:02,796 weather OpenWeatherMap error: 401 Client Error: Unauthorized for url: https://api.openweathermap.org/data/2.5/weather?q=Minsk&appid=e88847dc22c2cd33c674e25cbe5a5eda&units=metric&lang=ru
+WARNING 2026-05-21 09:56:13,136 weather OpenWeatherMap error: 401 Client Error: Unauthorized for url: https://api.openweathermap.org/data/2.5/weather?q=Minsk&appid=e88847dc22c2cd33c674e25cbe5a5eda&units=metric&lang=ru
+WARNING 2026-05-21 09:56:20,784 currency NBRB API error: HTTPSConnectionPool(host='www.nbrb.by', port=443): Max retries exceeded with url: /api/exrates/rates/USD?parammode=2 (Caused by SSLError(SSLError(1, '[SSL: WRONG_VERSION_NUMBER] wrong version number (_ssl.c:1000)')))
+INFO 2026-05-21 09:56:22,765 charts Chart saved: /home/dimas/University/sem_4/IGI/LR5/media/analytics/sales_by_date.png
+INFO 2026-05-21 09:56:22,907 charts Chart saved: /home/dimas/University/sem_4/IGI/LR5/media/analytics/category_popularity.png
+WARNING 2026-05-21 10:00:06,973 currency NBRB API error: HTTPSConnectionPool(host='www.nbrb.by', port=443): Max retries exceeded with url: /api/exrates/rates/USD?parammode=2 (Caused by SSLError(SSLError(1, '[SSL: WRONG_VERSION_NUMBER] wrong version number (_ssl.c:1000)')))
+INFO 2026-05-21 10:00:08,815 charts Chart saved: /home/dimas/University/sem_4/IGI/LR5/media/analytics/sales_by_date.png
+INFO 2026-05-21 10:00:08,936 charts Chart saved: /home/dimas/University/sem_4/IGI/LR5/media/analytics/category_popularity.png
+WARNING 2026-05-21 10:00:32,690 currency NBRB API error: HTTPSConnectionPool(host='www.nbrb.by', port=443): Max retries exceeded with url: /api/exrates/rates/USD?parammode=2 (Caused by SSLError(SSLError(1, '[SSL: WRONG_VERSION_NUMBER] wrong version number (_ssl.c:1000)')))
+INFO 2026-05-21 10:00:34,476 charts Chart saved: /home/dimas/University/sem_4/IGI/LR5/media/analytics/sales_by_date.png
+INFO 2026-05-21 10:00:34,591 charts Chart saved: /home/dimas/University/sem_4/IGI/LR5/media/analytics/category_popularity.png
+INFO 2026-05-21 10:20:54,823 pharmacy.charts charts Chart saved: /home/dimas/University/sem_4/IGI/LR5/media/analytics/sales_by_date.png
+INFO 2026-05-21 10:20:54,953 pharmacy.charts charts Chart saved: /home/dimas/University/sem_4/IGI/LR5/media/analytics/category_popularity.png
+INFO 2026-05-21 10:21:53,384 pharmacy.charts charts Chart saved: /home/dimas/University/sem_4/IGI/LR5/media/analytics/sales_by_date.png
+INFO 2026-05-21 10:21:53,513 pharmacy.charts charts Chart saved: /home/dimas/University/sem_4/IGI/LR5/media/analytics/category_popularity.png
+INFO 2026-05-21 10:22:43,786 pharmacy.charts charts Chart saved: /home/dimas/University/sem_4/IGI/LR5/media/analytics/sales_by_date.png
+INFO 2026-05-21 10:22:43,917 pharmacy.charts charts Chart saved: /home/dimas/University/sem_4/IGI/LR5/media/analytics/category_popularity.png
+INFO 2026-05-21 10:28:10,709 pharmacy.charts charts Chart saved: /home/dimas/University/sem_4/IGI/LR5/media/analytics/sales_by_date.png
+INFO 2026-05-21 10:28:10,840 pharmacy.charts charts Chart saved: /home/dimas/University/sem_4/IGI/LR5/media/analytics/category_popularity.png
+INFO 2026-05-21 10:31:34,594 pharmacy.charts charts Chart saved: /home/dimas/University/sem_4/IGI/LR5/media/analytics/sales_by_date.png
+INFO 2026-05-21 10:31:34,685 pharmacy.charts charts Chart saved: /home/dimas/University/sem_4/IGI/LR5/media/analytics/category_popularity.png
