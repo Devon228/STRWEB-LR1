@@ -8,3 +8,5 @@ htmlcov/
 app.log
 logs/
 .pytest_cache/
+splitted_text/
+text.txt
