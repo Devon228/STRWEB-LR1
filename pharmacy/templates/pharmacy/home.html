@@ -1,22 +1,134 @@
 {% extends 'pharmacy/base.html' %}
-{% block title %}Главная — Аптека{% endblock %}
+{% load static %}
+{% block title %}Главная — Аптека «Здоровье+»{% endblock %}
 {% block weather_widget %}
 {% if user.is_authenticated %}
     {% include 'pharmacy/includes/weather_widget.html' %}
 {% endif %}
 {% endblock %}
 {% block content %}
-<h2>Главная</h2>
+<hgroup>
+    <h2>Сеть аптек «Здоровье+»</h2>
+</hgroup>
+<p>Здоровье семьи — наша забота с 2010 года</p>
 <p><small>Часовой пояс: {{ user_timezone }} | Сейчас: {{ user_now|date:"d/m/Y H:i" }}</small></p>
-{% if latest_article %}
-    <h3>Последняя новость</h3>
-    {% include 'pharmacy/includes/article_image.html' with article=latest_article %}
-    <p><strong>{{ latest_article.title }}</strong></p>
-    <p>{{ latest_article.summary }}</p>
-    <p>Опубликовано: {{ latest_article.published_at|date:"d/m/Y H:i" }}</p>
-    <p><a href="{% url 'pharmacy:news_detail' latest_article.pk %}">Читать далее</a></p>
-{% else %}
-    <p>Новостей пока нет.</p>
-{% endif %}
-<p><a href="{% url 'pharmacy:news_list' %}">Все новости</a> | <a href="{% url 'pharmacy:medication_list' %}">Каталог</a></p>
+
+<section>
+    <h2>Логотип компании</h2>
+    <img src="{% static 'pharmacy/img/logo.svg' %}" alt="Логотип сети аптек «Здоровье+»" width="240" height="80">
+</section>
+
+<section>
+    <h2>Реклама и акции компании</h2>
+    <figure>
+        <picture>
+            <source media="(max-width: 600px)" srcset="{% static 'pharmacy/img/news/pharmacy1.jpeg' %}">
+            <img src="{% static 'pharmacy/img/news/pharmacy2.jpeg' %}" alt="Баннер: скидки на витаминные комплексы" width="640" height="360" loading="lazy">
+        </picture>
+        <picture>
+            <source media="(max-width: 600px)" srcset="{% static 'pharmacy/img/news/pharmacy2.jpeg' %}">
+            <img src="{% static 'pharmacy/img/news/pharmacy3.jpeg' %}" alt="Баннер: открытие нового филиала в Минске" width="640" height="360" loading="lazy">
+        </picture>
+        <picture>
+            <source media="(max-width: 600px)" srcset="{% static 'pharmacy/img/news/pharmacy3.jpeg' %}">
+            <img src="{% static 'pharmacy/img/news/pharmacy1.jpeg' %}" alt="Баннер: бесплатная консультация фармацевта" width="640" height="360" loading="lazy">
+        </picture>
+        <figcaption>Рекламные баннеры сети аптек «Здоровье+»: акции, филиалы и консультации.</figcaption>
+    </figure>
+</section>
+
+<section>
+    <h2>Каталог товаров и услуг</h2>
+    <p>Промокод месяца: <mark>WINTER15</mark> — скидка 15% на весь ассортимент.</p>
+    <ul>
+        <li><a href="{% url 'pharmacy:medication_list' %}">Медикаменты</a> — более 12 позиций в наличии</li>
+        <li><a href="{% url 'pharmacy:category_list' %}">Категории препаратов</a> — от анальгетиков до витаминов</li>
+        <li><a href="{% url 'pharmacy:service_list' %}">Дополнительные услуги</a> — измерение давления, доставка</li>
+        <li><a href="{% url 'pharmacy:pickup_list' %}">Точки самовывоза</a> — три филиала в Минске</li>
+    </ul>
+</section>
+
+<section>
+    <h2>Последняя опубликованная статья</h2>
+    {% if latest_article %}
+        <article>
+            <h3>{{ latest_article.title }}</h3>
+            {% include 'pharmacy/includes/article_image.html' with article=latest_article %}
+            <p>{{ latest_article.summary }}</p>
+            <p>Опубликовано:
+                <time datetime="{{ latest_article.published_at|date:'Y-m-d\TH:i' }}">{{ latest_article.published_at|date:"d/m/Y H:i" }}</time>
+            </p>
+            <p><a href="{% url 'pharmacy:news_detail' latest_article.pk %}">Читать далее</a></p>
+        </article>
+    {% else %}
+        <p>Новостей пока нет.</p>
+    {% endif %}
+    <p><a href="{% url 'pharmacy:news_list' %}">Все новости</a> | <a href="{% url 'pharmacy:medication_list' %}">Каталог</a></p>
+</section>
+
+<section>
+    <h2>Компании-партнёры</h2>
+    {% if partners %}
+        {% with first_group=partners|slice:":4" second_group=partners|slice:"4:" %}
+        <table border="1" cellpadding="6" cellspacing="0">
+            <caption>Компании-партнёры аптеки «Здоровье+» и ссылки на их сайты</caption>
+            <colgroup>
+                <col span="2">
+                <col span="3">
+            </colgroup>
+            <thead>
+                <tr>
+                    <th id="pt-group" scope="col">Направление</th>
+                    <th id="pt-logo" scope="col">Логотип</th>
+                    <th id="pt-name" scope="col">Компания</th>
+                    <th id="pt-site" scope="col">Сайт</th>
+                    <th id="pt-desc" scope="col">Описание</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for partner in first_group %}
+                    <tr>
+                        {% if forloop.first %}
+                            <td headers="pt-group" rowspan="{{ first_group|length }}">Производство и поставки</td>
+                        {% endif %}
+                        <td headers="pt-logo">
+                            <a href="{{ partner.website_url }}" target="_blank" rel="noopener">
+                                <img src="{{ partner.logo_url }}" alt="Логотип {{ partner.name }}" width="180" height="60" loading="lazy">
+                            </a>
+                        </td>
+                        <td headers="pt-name"><a href="{{ partner.website_url }}" target="_blank" rel="noopener">{{ partner.name }}</a></td>
+                        <td headers="pt-site"><a href="{{ partner.website_url }}" target="_blank" rel="noopener">{{ partner.website_url }}</a></td>
+                        <td headers="pt-desc">{{ partner.description }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+            <tbody>
+                {% for partner in second_group %}
+                    <tr>
+                        {% if forloop.first %}
+                            <td headers="pt-group" rowspan="{{ second_group|length }}">Сервис и технологии</td>
+                        {% endif %}
+                        <td headers="pt-logo">
+                            <a href="{{ partner.website_url }}" target="_blank" rel="noopener">
+                                <img src="{{ partner.logo_url }}" alt="Логотип {{ partner.name }}" width="180" height="60" loading="lazy">
+                            </a>
+                        </td>
+                        <td headers="pt-name"><a href="{{ partner.website_url }}" target="_blank" rel="noopener">{{ partner.name }}</a></td>
+                        <td headers="pt-site"><a href="{{ partner.website_url }}" target="_blank" rel="noopener">{{ partner.website_url }}</a></td>
+                        <td headers="pt-desc">{{ partner.description }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+            <tfoot>
+                <tr>
+                    <th scope="row" colspan="4">Всего компаний-партнёров</th>
+                    <td>{{ partners|length }}</td>
+                </tr>
+            </tfoot>
+        </table>
+        {% endwith %}
+    {% else %}
+        <p>Партнёры пока не добавлены.</p>
+    {% endif %}
+</section>
 {% endblock %}

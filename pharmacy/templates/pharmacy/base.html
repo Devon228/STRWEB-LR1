@@ -1,17 +1,39 @@
-<!DOCTYPE html>
+{% load static %}<!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>{% block title %}Аптека{% endblock %}</title>
-    {% block extra_styles %}{% endblock %}
+    <base target="_self">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Аптека «Здоровье+» — лекарства, витамины, консультации фармацевтов, онлайн-заказ и самовывоз в Минске.">
+    <meta name="keywords" content="аптека, Здоровье+, лекарства, витамины, Минск, самовывоз, промокоды">
+    <meta name="author" content="Сеть аптек «Здоровье+»">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Аптека «Здоровье+»">
+    <meta property="og:title" content="Аптека «Здоровье+» — официальный сайт">
+    <meta property="og:description" content="Каталог медикаментов, новости, отзывы, промокоды и онлайн-заказ в аптеке «Здоровье+».">
+    <meta property="og:image" content="{% static 'pharmacy/img/news/pharmacy1.jpeg' %}">
+    <title>{% block title %}Аптека «Здоровье+»{% endblock %}</title>
+    <link rel="icon" href="{% static 'pharmacy/img/favicon.svg' %}" type="image/svg+xml">
+    <style></style>
 </head>
-<body>
-    <header class="site-header">
-        <h1>Аптека «Здоровье+»</h1>
+<body itemscope itemtype="https://schema.org/Pharmacy">
+    <noscript>
+        <p><strong>Внимание!</strong> Для работы корзины, демо-оплаты и переключения часового пояса включите JavaScript в браузере.</p>
+    </noscript>
+
+    <header id="top">
+        <div>
+            <svg width="40" height="40" viewBox="0 0 32 32" role="img" aria-label="Логотип аптеки «Здоровье+»">
+                <rect x="1" y="1" width="30" height="30" rx="6" fill="#1d4ed8"></rect>
+                <rect x="13" y="6" width="6" height="20" fill="#ffffff"></rect>
+                <rect x="6" y="13" width="20" height="6" fill="#ffffff"></rect>
+            </svg>
+            <h1 itemprop="name">Аптека «Здоровье+»</h1>
+        </div>
         <p>Роль: <strong>{{ current_role_label }}</strong>
-            {% if user.is_authenticated %}({{ user.username }}){% endif %}
+            <span>{% if user.is_authenticated %}({{ user.username }}){% endif %}</span>
         </p>
-        <nav class="site-nav">
+        <nav class="site-nav" aria-label="Главное горизонтальное меню">
             <a href="{% url 'pharmacy:home' %}">Главная</a> |
             <a href="{% url 'pharmacy:about' %}">О компании</a> |
             <a href="{% url 'pharmacy:news_list' %}">Новости</a> |
@@ -23,7 +45,8 @@
             <a href="{% url 'pharmacy:medication_list' %}">Медикаменты</a> |
             <a href="{% url 'pharmacy:promo_list' %}">Промокоды</a> |
             <a href="{% url 'pharmacy:service_list' %}">Доп. услуги</a> |
-            <a href="{% url 'pharmacy:review_list' %}">Отзывы</a>
+            <a href="{% url 'pharmacy:review_list' %}">Отзывы</a> |
+            <a href="{% url 'pharmacy:cart' %}">Корзина</a>
             {% if current_role == 'customer' %}
                 | <a href="{% url 'pharmacy:pickup_list' %}">Самовывоз</a>
                 | <a href="{% url 'pharmacy:purchase_list' %}">Мои покупки</a>
@@ -44,7 +67,7 @@
                 | <a href="{% url 'admin:index' %}">Админка Django</a>
             {% endif %}
             {% if user.is_authenticated %}
-                | <form method="post" action="{% url 'pharmacy:logout' %}" style="display:inline">
+                | <form method="post" action="{% url 'pharmacy:logout' %}">
                     {% csrf_token %}
                     <button type="submit">Выход</button>
                 </form>
@@ -65,9 +88,57 @@
         </ul>
     {% endif %}
 
-    <main>
-        {% block content %}{% endblock %}
-    </main>
+    <div>
+        <aside aria-label="Вертикальная навигация по разделам сайта">
+            <h2>Разделы сайта</h2>
+            <ul>
+                <li><a href="{% url 'pharmacy:home' %}">Главная</a></li>
+                <li><a href="{% url 'pharmacy:about' %}">О компании</a></li>
+                <li><a href="{% url 'pharmacy:news_list' %}">Новости</a></li>
+                <li><a href="{% url 'pharmacy:glossary_list' %}">Словарь терминов</a></li>
+                <li><a href="{% url 'pharmacy:contact_list' %}">Контакты</a></li>
+                <li><a href="{% url 'pharmacy:vacancy_list' %}">Вакансии</a></li>
+                <li><a href="{% url 'pharmacy:promo_list' %}">Промокоды и купоны</a></li>
+                <li><a href="{% url 'pharmacy:review_list' %}">Отзывы</a></li>
+                <li><a href="{% url 'pharmacy:privacy' %}">Политика конфиденциальности</a></li>
+                <li><a href="{% url 'pharmacy:cart' %}">Корзина заказа</a></li>
+            </ul>
+            <h3>Каталог</h3>
+            <ul>
+                <li><a href="{% url 'pharmacy:medication_list' %}">Медикаменты</a></li>
+                <li><a href="{% url 'pharmacy:category_list' %}">Категории</a></li>
+                <li><a href="{% url 'pharmacy:service_list' %}">Дополнительные услуги</a></li>
+                <li><a href="#top">Наверх страницы</a></li>
+            </ul>
+        </aside>
+
+        <main>
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+
+    <hr>
+    <footer>
+        <h2>Аптека «Здоровье+»</h2>
+        <h3>Контакты и адрес</h3>
+        <address itemprop="address" itemscope itemtype="https://schema.org/PostalAddress">
+            <span itemprop="postalCode">220030</span>,
+            <span itemprop="addressLocality">г. Минск</span>,
+            <span itemprop="streetAddress">пр-т Независимости, 1</span><br>
+            Телефон: <a href="tel:+375172000000">+375 (17) 200-00-00</a><br>
+            Почта: <a href="mailto:info@zdorovie-plus.by">info@zdorovie-plus.by</a><br>
+            Режим работы: <time datetime="08:00">ежедневно 08:00–22:00</time>
+        </address>
+        <nav aria-label="Навигация в подвале">
+            <ul>
+                <li><a href="{% url 'pharmacy:about' %}">О компании</a></li>
+                <li><a href="{% url 'pharmacy:vacancy_list' %}">Вакансии</a></li>
+                <li><a href="{% url 'pharmacy:privacy' %}">Политика конфиденциальности</a></li>
+                <li><a href="{% url 'pharmacy:concurrency_demo' %}">Демо Asyncio</a></li>
+            </ul>
+        </nav>
+        <p><small>© 2026 Сеть аптек «Здоровье+». Учебный проект, цены указаны в BYN.</small></p>
+    </footer>
 
     <script>
         (function() {

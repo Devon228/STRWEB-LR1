@@ -1,14 +1,16 @@
 {% extends 'pharmacy/base.html' %}
-{% block title %}Новости{% endblock %}
+{% block title %}Новости — Аптека «Здоровье+»{% endblock %}
 {% block content %}
-<h2>Новости</h2>
+<h2>Новости аптеки</h2>
 <p><small>Часовой пояс: {{ user_timezone }}</small></p>
 {% for article in articles %}
     <article>
         <h3>{{ article.title }}</h3>
         {% include 'pharmacy/includes/article_image.html' with article=article %}
         <p>{{ article.summary }}</p>
-        <p><small>{{ article.published_at|date:"d/m/Y H:i" }}</small></p>
+        <p><small>Опубликовано:
+            <time datetime="{{ article.published_at|date:'Y-m-d\TH:i' }}">{{ article.published_at|date:"d/m/Y H:i" }}</time>
+        </small></p>
         <p><a href="{% url 'pharmacy:news_detail' article.pk %}">Читать далее</a></p>
         <hr>
     </article>

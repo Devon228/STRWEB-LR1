@@ -1,24 +1,103 @@
 {% extends 'pharmacy/base.html' %}
-{% block title %}О компании{% endblock %}
+{% load static %}
+{% block title %}О компании — Аптека «Здоровье+»{% endblock %}
 {% block content %}
 <h2>О компании</h2>
+<nav aria-label="Содержание страницы о компании">
+    <ul>
+        <li><a href="#about-info">Информация о компании</a></li>
+        <li><a href="#about-history">История по годам</a></li>
+        <li><a href="#about-requisites">Реквизиты</a></li>
+        <li><a href="#about-certificate">Сертификат</a></li>
+        <li><a href="#about-media">Видео и аудио</a></li>
+    </ul>
+</nav>
+
 {% if company %}
-    <h3>{{ company.title }}</h3>
-    <p>{{ company.about_text|linebreaks }}</p>
-    {% if company.history %}
-        <h4>История</h4>
-        <pre>{{ company.history }}</pre>
-    {% endif %}
-    {% if company.requisites %}
+    <section id="about-info">
+        <h3>{{ company.title }}</h3>
+        <div>{{ company.about_text|linebreaks }}</div>
+        {% if company.logo %}
+            <p><img src="{{ company.logo.url }}" alt="Логотип компании" width="200"></p>
+        {% else %}
+            <p><img src="{% static 'pharmacy/img/logo.svg' %}" alt="Логотип компании «Здоровье+»" width="240" height="80"></p>
+        {% endif %}
+        <blockquote cite="https://www.who.int/ru">
+            <p>Здоровье — это состояние полного физического, душевного и социального благополучия, а не только отсутствие болезней и физических дефектов.</p>
+        </blockquote>
+        <p>Источник: <cite>Устав Всемирной организации здравоохранения</cite>.</p>
+        <p>Наши провизоры напоминают: <q cite="https://www.who.int/ru">правильно подобранный препарат экономит время и деньги</q>.</p>
+    </section>
+
+    <section id="about-history">
+        <h4>История по годам</h4>
+        <h5>Как развивалась сеть</h5>
+        {% if company.history %}
+            <pre>{{ company.history }}</pre>
+        {% else %}
+            <p>История компании пока не заполнена.</p>
+        {% endif %}
+    </section>
+
+    <section id="about-requisites">
         <h4>Реквизиты</h4>
-        <pre>{{ company.requisites }}</pre>
-    {% endif %}
-    {% if company.video_url %}
-        <p>Видео: <a href="{{ company.video_url }}">{{ company.video_url }}</a></p>
-    {% endif %}
-    {% if company.logo %}
-        <p><img src="{{ company.logo.url }}" alt="Логотип" width="200"></p>
-    {% endif %}
+        <h5>Официальные данные организации</h5>
+        {% if company.requisites %}
+            <pre>{{ company.requisites }}</pre>
+        {% else %}
+            <p>Реквизиты пока не заполнены.</p>
+        {% endif %}
+    </section>
+
+    <section id="about-certificate">
+        <h4>Сертификат</h4>
+        <h5>Единый реестр аптечных организаций</h5>
+        <h6>Свидетельство о внесении сведений</h6>
+        <pre>ЕДИНЫЙ РЕЕСТР АПТЕЧНЫХ ОРГАНИЗАЦИЙ
+СВИДЕТЕЛЬСТВО о внесении сведений
+ООО «Аптека Здоровье+»
+УНП 123456789
+г. Минск, пр-т Независимости, 1
+Реестровый номер: 8241
+Дата выдачи: 15 сентября 2026 г.</pre>
+        <p><small>Документ приведён текстом без оформления стилями; PDF-версия доступна для просмотра и скачивания.</small></p>
+        <figure>
+            <object data="{% static 'pharmacy/docs/certificate.pdf' %}" type="application/pdf" width="640" height="800">
+                <p>Не удалось отобразить сертификат. <a href="{% static 'pharmacy/docs/certificate.pdf' %}" download>Скачать сертификат (PDF)</a>.</p>
+            </object>
+            <figcaption>Сертификат члена ассоциации аптек «Здоровье+».</figcaption>
+        </figure>
+    </section>
+
+    <section id="about-media">
+        <h4>Видео и аудио</h4>
+        {% if company.video_url %}
+            <p>Официальный видеоролик: <a href="{{ company.video_url }}">{{ company.video_url }}</a></p>
+        {% endif %}
+        <figure>
+            <video controls width="640" poster="{% static 'pharmacy/img/news/pharmacy2.jpeg' %}">
+                <source src="https://www.w3schools.com/html/mov_bbb.mp4" type="video/mp4">
+                <track kind="subtitles" src="{% static 'pharmacy/docs/subtitles.vtt' %}" srclang="ru" label="Русские субтитры" default>
+                Ваш браузер не поддерживает видео. <a href="https://www.w3schools.com/html/mov_bbb.mp4" download>Скачать ролик</a>.
+            </video>
+            <figcaption>Презентационный ролик аптеки «Здоровье+» с субтитрами.</figcaption>
+        </figure>
+        <p><b>Аудио:</b> <strong>звуковая заставка</strong> сети аптек.</p>
+        <audio controls>
+            <source src="{% static 'pharmacy/docs/tone.wav' %}" type="audio/wav">
+            Ваш браузер не поддерживает аудио. <a href="{% static 'pharmacy/docs/tone.wav' %}" download>Скачать аудиофайл</a>.
+        </audio>
+    </section>
+
+    <section>
+        <h3>Термины и факты</h3>
+        <p><dfn>Аптечная организация</dfn> — организация, осуществляющая <abbr title="фармацевтическую">фарм.</abbr> деятельность и розничную реализацию лекарственных средств.</p>
+        <p><b>Обратите внимание:</b> <strong>рецептурные препараты</strong> отпускаются <em>только</em> по назначению врача. Латинское название парацетамола — <i>Paracetamolum</i>.</p>
+        <p>Формула воды — H<sub>2</sub>O, углекислого газа — CO<sub>2</sub>; площадь склада — 1200 м<sup>2</sup>.</p>
+        <p><mark>Витамины со скидкой 15%</mark> — акция месяца. Старая цена: <s>18,70 BYN</s>, новая цена: <strong>15,90 BYN</strong>.</p>
+        <p><u>Внимание:</u> срок действия акции ограничен, уточняйте у провизора.</p>
+        <p><small>Информация размещена в справочных целях и не является медицинской консультацией.</small></p>
+    </section>
 {% else %}
     <p>Информация о компании пока не добавлена.</p>
 {% endif %}

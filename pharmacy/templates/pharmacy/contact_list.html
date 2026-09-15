@@ -1,14 +1,28 @@
 {% extends 'pharmacy/base.html' %}
-{% block title %}Контакты{% endblock %}
+{% block title %}Контакты — Аптека «Здоровье+»{% endblock %}
 {% block content %}
 <h2>Контакты</h2>
+<p><small>Фото сотрудников, описание выполняемых работ, телефоны и адреса электронной почты.</small></p>
+
+<figure>
+    <iframe
+        src="https://www.openstreetmap.org/export/embed.html?bbox=27.540%2C53.890%2C27.600%2C53.920&amp;layer=mapnik&amp;marker=53.905%2C27.562"
+        width="600"
+        height="400"
+        title="Карта проезда к аптеке «Здоровье+»"
+    ></iframe>
+    <figcaption>Схема проезда: г. Минск, пр-т Независимости, 1.</figcaption>
+</figure>
+
 {% for contact in contacts %}
     <section>
         {% include 'pharmacy/includes/contact_photo.html' with contact=contact %}
         <h3>{{ contact.full_name }}</h3>
-        <p>{{ contact.job_description|linebreaks }}</p>
-        <p>Тел.: {{ contact.phone }}</p>
-        <p>Email: <a href="mailto:{{ contact.email }}">{{ contact.email }}</a></p>
+        <div>{{ contact.job_description|linebreaks }}</div>
+        <address>
+            <p>Тел.: <a href="tel:{{ contact.phone|cut:' '|cut:'('|cut:')'|cut:'-' }}">{{ contact.phone }}</a></p>
+            <p>Почта: <a href="mailto:{{ contact.email }}">{{ contact.email }}</a></p>
+        </address>
         <hr>
     </section>
 {% empty %}

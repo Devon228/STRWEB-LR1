@@ -1,0 +1,190 @@
+{% extends 'pharmacy/base.html' %}
+{% block title %}Корзина заказа — Аптека «Здоровье+»{% endblock %}
+{% block content %}
+<h2>Корзина заказа</h2>
+<noscript>
+    <p><strong>Корзина недоступна:</strong> для добавления товаров, изменения количества и оформления заказа включите JavaScript в браузере.</p>
+</noscript>
+
+<p><small>Корзина хранится локально в вашем браузере (ключ <code>pharmacy_cart</code>) и исчезает после оплаты.</small></p>
+
+<table border="1" cellpadding="4" cellspacing="0" id="cart-table">
+    <caption>Товары, добавленные в корзину</caption>
+    <colgroup>
+        <col span="2">
+        <col span="3">
+    </colgroup>
+    <thead>
+        <tr>
+            <th id="ct-name" scope="col">Товар</th>
+            <th id="ct-price" scope="col">Цена, BYN</th>
+            <th id="ct-qty" scope="col">Количество</th>
+            <th id="ct-sum" scope="col">Сумма, BYN</th>
+            <th id="ct-actions" scope="col">Действия</th>
+        </tr>
+    </thead>
+    <tbody id="cart-items">
+        <tr>
+            <td colspan="5">Загрузка корзины…</td>
+        </tr>
+    </tbody>
+    <tfoot>
+        <tr>
+            <th scope="row" colspan="3">Итого к оплате</th>
+            <td colspan="2"><output id="cart-total" for="cart-table">0.00</output> BYN</td>
+        </tr>
+    </tfoot>
+</table>
+
+<p>
+    <a href="{% url 'pharmacy:payment' %}">Оплатить</a>
+    <button type="button" id="clear-cart">Удалить все товары из корзины</button>
+</p>
+<p><a href="{% url 'pharmacy:medication_list' %}">← Вернуться в каталог</a></p>
+
+<script>
+(function () {
+    var CART_KEY = 'pharmacy_cart';
+
+    function readCart() {
+        try {
+            var parsed = JSON.parse(localStorage.getItem(CART_KEY) || '[]');
+            return Array.isArray(parsed) ? parsed : [];
+        } catch (error) {
+            return [];
+        }
+    }
+
+    function writeCart(items) {
+        localStorage.setItem(CART_KEY, JSON.stringify(items));
+    }
+
+    function formatPrice(value) {
+        return Number(value).toFixed(2);
+    }
+
+    function changeQty(code, delta) {
+        var items = readCart();
+        items.forEach(function (item) {
+            if (item.code === code) {
+                item.qty += delta;
+                if (item.qty < 1) {
+                    item.qty = 1;
+                }
+            }
+        });
+        writeCart(items);
+        render();
+    }
+
+    function setQty(code, value) {
+        var qty = parseInt(value, 10);
+        if (isNaN(qty) || qty < 1) {
+            qty = 1;
+        }
+        var items = readCart();
+        items.forEach(function (item) {
+            if (item.code === code) {
+                item.qty = qty;
+            }
+        });
+        writeCart(items);
+        render();
+    }
+
+    function removeItem(code) {
+        writeCart(readCart().filter(function (item) {
+            return item.code !== code;
+        }));
+        render();
+    }
+
+    function render() {
+        var items = readCart();
+        var tbody = document.getElementById('cart-items');
+        tbody.textContent = '';
+        var total = 0;
+
+        if (items.length === 0) {
+            var emptyRow = document.createElement('tr');
+            var emptyCell = document.createElement('td');
+            emptyCell.colSpan = 5;
+            emptyCell.textContent = 'Корзина пуста. Добавьте товары из каталога.';
+            emptyRow.appendChild(emptyCell);
+            tbody.appendChild(emptyRow);
+        }
+
+        items.forEach(function (item) {
+            total += item.price * item.qty;
+
+            var row = document.createElement('tr');
+
+            var nameCell = document.createElement('td');
+            nameCell.textContent = item.name + ' (' + item.code + ')';
+            row.appendChild(nameCell);
+
+            var priceCell = document.createElement('td');
+            priceCell.textContent = formatPrice(item.price);
+            row.appendChild(priceCell);
+
+            var qtyCell = document.createElement('td');
+            var decreaseButton = document.createElement('button');
+            decreaseButton.type = 'button';
+            decreaseButton.textContent = '−';
+            decreaseButton.setAttribute('aria-label', 'Уменьшить количество ' + item.name);
+            decreaseButton.addEventListener('click', function () {
+                changeQty(item.code, -1);
+            });
+            var qtyInput = document.createElement('input');
+            qtyInput.type = 'number';
+            qtyInput.min = '1';
+            qtyInput.value = item.qty;
+            qtyInput.setAttribute('aria-label', 'Количество товара ' + item.name);
+            qtyInput.addEventListener('change', function () {
+                setQty(item.code, qtyInput.value);
+            });
+            var increaseButton = document.createElement('button');
+            increaseButton.type = 'button';
+            increaseButton.textContent = '+';
+            increaseButton.setAttribute('aria-label', 'Увеличить количество ' + item.name);
+            increaseButton.addEventListener('click', function () {
+                changeQty(item.code, 1);
+            });
+            qtyCell.appendChild(decreaseButton);
+            qtyCell.appendChild(qtyInput);
+            qtyCell.appendChild(increaseButton);
+            row.appendChild(qtyCell);
+
+            var sumCell = document.createElement('td');
+            sumCell.textContent = formatPrice(item.price * item.qty);
+            row.appendChild(sumCell);
+
+            var actionsCell = document.createElement('td');
+            var removeButton = document.createElement('button');
+            removeButton.type = 'button';
+            removeButton.textContent = 'Удалить из корзины';
+            removeButton.addEventListener('click', function () {
+                removeItem(item.code);
+            });
+            actionsCell.appendChild(removeButton);
+            row.appendChild(actionsCell);
+
+            tbody.appendChild(row);
+        });
+
+        var output = document.getElementById('cart-total');
+        if (output) {
+            output.value = formatPrice(total);
+            output.textContent = formatPrice(total);
+        }
+    }
+
+    document.getElementById('clear-cart').addEventListener('click', function () {
+        writeCart([]);
+        render();
+    });
+
+    render();
+})();
+</script>
+{% endblock %}

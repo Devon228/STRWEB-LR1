@@ -1,10 +1,41 @@
 {% extends 'pharmacy/base.html' %}
-{% block title %}Вход{% endblock %}
+{% block title %}Вход — Аптека «Здоровье+»{% endblock %}
 {% block content %}
 <h2>Вход</h2>
-<form method="post" novalidate>
+<form method="post">
     {% csrf_token %}
-    {{ form.as_p }}
+    {% if form.non_field_errors %}
+        <ul class="errorlist">
+            {% for error in form.non_field_errors %}
+                <li>{{ error }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+    <fieldset>
+        <legend>Учётные данные</legend>
+        <p>
+            {{ form.username.label_tag }}
+            {{ form.username }}
+            {% if form.username.errors %}
+                <ul class="errorlist">
+                    {% for error in form.username.errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        </p>
+        <p>
+            {{ form.password.label_tag }}
+            {{ form.password }}
+            {% if form.password.errors %}
+                <ul class="errorlist">
+                    {% for error in form.password.errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        </p>
+    </fieldset>
     <button type="submit">Войти</button>
 </form>
 <p>Нет аккаунта? <a href="{% url 'pharmacy:register' %}">Регистрация</a></p>

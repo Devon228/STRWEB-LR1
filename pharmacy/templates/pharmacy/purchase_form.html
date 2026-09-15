@@ -3,9 +3,36 @@
 {% block content %}
 <h2>Оформление покупки: {{ medication.name }}</h2>
 <p>Цена: {{ medication.price }} BYN за единицу</p>
-<form method="post" novalidate>
+<form method="post">
     {% csrf_token %}
-    {{ form.as_p }}
+    {% if form.non_field_errors %}
+        <ul class="errorlist">
+            {% for error in form.non_field_errors %}
+                <li>{{ error }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+    <fieldset>
+        <legend>Параметры покупки</legend>
+        <p>
+            {{ form.quantity.label_tag }}
+            {{ form.quantity }}
+            {% if form.quantity.errors %}
+                <ul class="errorlist">
+                    {% for error in form.quantity.errors %}<li>{{ error }}</li>{% endfor %}
+                </ul>
+            {% endif %}
+        </p>
+        <p>
+            {{ form.pickup_point.label_tag }}
+            {{ form.pickup_point }}
+            {% if form.pickup_point.errors %}
+                <ul class="errorlist">
+                    {% for error in form.pickup_point.errors %}<li>{{ error }}</li>{% endfor %}
+                </ul>
+            {% endif %}
+        </p>
+    </fieldset>
     <button type="submit">Купить</button>
 </form>
 {% endblock %}

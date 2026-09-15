@@ -2,12 +2,24 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Демонстрация Asyncio — подгрузка текстур</title>
 </head>
 <body>
     <h1>Демонстрация Задача В (Asyncio): Асинхронная подгрузка текстур с сервера во время игры</h1>
 
     <p>Изолированная симуляция игрового движка: {{ texture_count }} текстур загружаются конкурентно через <code>asyncio.gather()</code>.</p>
+    <p>Переменная <var>delay</var> задаёт задержку загрузки каждой текстуры, а результат виден в логе ниже.</p>
+    <p>Для перезапуска нажмите <kbd>Ctrl</kbd> + <kbd>F5</kbd>. Результат: <samp>Успешно загружено: {{ texture_count }} текстур</samp>.</p>
+
+    <h2>Пример кода</h2>
+    <pre><code>async def load_texture(name, delay):
+    await asyncio.sleep(delay)
+    return name
+
+async def main():
+    textures = await asyncio.gather(load_texture("wall", 0.5))
+    print(textures)</code></pre>
 
     <h2>Лог загрузки</h2>
     <table border="1" cellpadding="4" cellspacing="0">

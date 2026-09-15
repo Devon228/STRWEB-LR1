@@ -86,4 +86,6 @@ urlpatterns = [
         name='concurrency_demo',
     ),
     re_path(r'^set-timezone/$', views.set_timezone_view, name='set_timezone'),
+    re_path(r'^cart/$', views.CartView.as_view(), name='cart'),
+    re_path(r'^payment/$', views.PaymentView.as_view(), name='payment'),
 ]

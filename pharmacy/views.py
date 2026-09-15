@@ -46,6 +46,7 @@ from pharmacy.models import (
     Glossary,
     Medication,
     MedicationCategory,
+    Partner,
     PickupPoint,
     PromoCode,
     Purchase,
@@ -84,6 +85,7 @@ class HomeView(TemplateView):
         )
         if self.request.user.is_authenticated:
             context['weather'] = get_weather_cached()
+        context['partners'] = Partner.objects.order_by('name')
         return context
 
 
@@ -631,6 +633,14 @@ class AnalyticsView(OwnerRequiredMixin, TemplateView):
             context['usd_to_byn'] = rate_byn
 
         return context
+
+
+class CartView(TemplateView):
+    template_name = 'pharmacy/cart.html'
+
+
+class PaymentView(TemplateView):
+    template_name = 'pharmacy/payment.html'
 
 
 def concurrency_demo_view(request):

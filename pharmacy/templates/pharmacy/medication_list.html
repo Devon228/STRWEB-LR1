@@ -1,5 +1,5 @@
 {% extends 'pharmacy/base.html' %}
-{% block title %}Медикаменты{% endblock %}
+{% block title %}Медикаменты — Аптека «Здоровье+»{% endblock %}
 {% block content %}
 <h2>Медикаменты</h2>
 {% if is_owner %}
@@ -8,12 +8,73 @@
 
 <h3>Поиск и фильтры</h3>
 <form method="get" action="{% url 'pharmacy:medication_list' %}">
-    {{ filter_form.as_p }}
+    {% if filter_form.non_field_errors %}
+        <ul class="errorlist">
+            {% for error in filter_form.non_field_errors %}
+                <li>{{ error }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+    <fieldset>
+        <legend>Параметры поиска</legend>
+        <p>
+            <label for="id_q">Поиск</label>
+            <input type="text" id="id_q" name="q" value="{{ filter_form.q.value|default_if_none:'' }}" list="medication-suggestions" placeholder="Название, описание или код">
+            <datalist id="medication-suggestions">
+                <option value="Парацетамол"></option>
+                <option value="Ибупрофен"></option>
+                <option value="Витамины"></option>
+                <option value="Антибиотики"></option>
+            </datalist>
+            {% if filter_form.q.errors %}
+                <ul class="errorlist">
+                    {% for error in filter_form.q.errors %}<li>{{ error }}</li>{% endfor %}
+                </ul>
+            {% endif %}
+        </p>
+        <p>
+            {{ filter_form.category.label_tag }}
+            {{ filter_form.category }}
+            {% if filter_form.category.errors %}
+                <ul class="errorlist">
+                    {% for error in filter_form.category.errors %}<li>{{ error }}</li>{% endfor %}
+                </ul>
+            {% endif %}
+        </p>
+        <p>
+            {{ filter_form.price_min.label_tag }}
+            {{ filter_form.price_min }}
+            {% if filter_form.price_min.errors %}
+                <ul class="errorlist">
+                    {% for error in filter_form.price_min.errors %}<li>{{ error }}</li>{% endfor %}
+                </ul>
+            {% endif %}
+        </p>
+        <p>
+            {{ filter_form.price_max.label_tag }}
+            {{ filter_form.price_max }}
+            {% if filter_form.price_max.errors %}
+                <ul class="errorlist">
+                    {% for error in filter_form.price_max.errors %}<li>{{ error }}</li>{% endfor %}
+                </ul>
+            {% endif %}
+        </p>
+        <p>
+            {{ filter_form.sort.label_tag }}
+            {{ filter_form.sort }}
+            {% if filter_form.sort.errors %}
+                <ul class="errorlist">
+                    {% for error in filter_form.sort.errors %}<li>{{ error }}</li>{% endfor %}
+                </ul>
+            {% endif %}
+        </p>
+    </fieldset>
     <button type="submit">Применить</button>
     <a href="{% url 'pharmacy:medication_list' %}">Сбросить</a>
 </form>
 
 <table border="1" cellpadding="4">
+    <caption>Каталог медикаментов аптеки «Здоровье+»</caption>
     <thead>
         <tr>
             <th>Код</th>

@@ -1,11 +1,55 @@
 {% extends 'pharmacy/base.html' %}
-{% block title %}Новый заказ{% endblock %}
+{% block title %}Новый заказ — Аптека «Здоровье+»{% endblock %}
 {% block content %}
 <h2>Добавить заказ</h2>
 <p>Дата покупки не может быть в будущем (включая завтра).</p>
-<form method="post" novalidate>
+<form method="post">
     {% csrf_token %}
-    {{ form.as_p }}
+    {% if form.non_field_errors %}
+        <ul class="errorlist">
+            {% for error in form.non_field_errors %}
+                <li>{{ error }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+    <fieldset>
+        <legend>Данные заказа</legend>
+        <p>
+            {{ form.customer.label_tag }}
+            {{ form.customer }}
+            {% if form.customer.errors %}
+                <ul class="errorlist">{% for error in form.customer.errors %}<li>{{ error }}</li>{% endfor %}</ul>
+            {% endif %}
+        </p>
+        <p>
+            {{ form.medication.label_tag }}
+            {{ form.medication }}
+            {% if form.medication.errors %}
+                <ul class="errorlist">{% for error in form.medication.errors %}<li>{{ error }}</li>{% endfor %}</ul>
+            {% endif %}
+        </p>
+        <p>
+            {{ form.pickup_point.label_tag }}
+            {{ form.pickup_point }}
+            {% if form.pickup_point.errors %}
+                <ul class="errorlist">{% for error in form.pickup_point.errors %}<li>{{ error }}</li>{% endfor %}</ul>
+            {% endif %}
+        </p>
+        <p>
+            {{ form.quantity.label_tag }}
+            {{ form.quantity }}
+            {% if form.quantity.errors %}
+                <ul class="errorlist">{% for error in form.quantity.errors %}<li>{{ error }}</li>{% endfor %}</ul>
+            {% endif %}
+        </p>
+        <p>
+            {{ form.purchased_at.label_tag }}
+            {{ form.purchased_at }}
+            {% if form.purchased_at.errors %}
+                <ul class="errorlist">{% for error in form.purchased_at.errors %}<li>{{ error }}</li>{% endfor %}</ul>
+            {% endif %}
+        </p>
+    </fieldset>
     <button type="submit">Сохранить</button>
     <a href="{% url 'pharmacy:staff_purchase_list' %}">Отмена</a>
 </form>

@@ -11,7 +11,7 @@
     {% for review in reviews %}
         <li>
             <strong>{{ review.author_name }}</strong> — {{ review.rating }}/5
-            ({{ review.published_at|date:"d/m/Y" }})<br>
+            (<time datetime="{{ review.published_at|date:'Y-m-d\TH:i' }}">{{ review.published_at|date:"d/m/Y" }}</time>)<br>
             {{ review.text }}
         </li>
     {% empty %}

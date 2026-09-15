@@ -13,7 +13,25 @@
     <p><strong>Локальное время:</strong> {{ current_datetime_user }}</p>
     <form method="post">
         {% csrf_token %}
-        {{ timezone_form.as_p }}
+        {% if timezone_form.non_field_errors %}
+            <ul class="errorlist">
+                {% for error in timezone_form.non_field_errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+        <fieldset>
+            <legend>Часовой пояс пользователя</legend>
+            <p>
+                {{ timezone_form.user_timezone.label_tag }}
+                {{ timezone_form.user_timezone }}
+                {% if timezone_form.user_timezone.errors %}
+                    <ul class="errorlist">
+                        {% for error in timezone_form.user_timezone.errors %}<li>{{ error }}</li>{% endfor %}
+                    </ul>
+                {% endif %}
+            </p>
+        </fieldset>
         <button type="submit">Сменить часовой пояс</button>
     </form>
     <h4>Календарь (текст)</h4>

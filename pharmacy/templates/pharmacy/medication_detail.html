@@ -1,17 +1,32 @@
 {% extends 'pharmacy/base.html' %}
-{% block title %}{{ medication.name }}{% endblock %}
+{% load static l10n %}
+{% block title %}{{ medication.name }} — Аптека «Здоровье+»{% endblock %}
 {% block content %}
 <h2>{{ medication.name }} ({{ medication.code }})</h2>
+<p><small>Карточка товара. Цена указана в белорусских рублях (BYN).</small></p>
+
 {% if medication.photo %}
-    <p><img src="{{ medication.photo.url }}" alt="{{ medication.name }}" width="300"></p>
+    <figure>
+        <img src="{{ medication.photo.url }}" alt="{{ medication.name }}" width="300" loading="lazy">
+        <figcaption>Фото препарата «{{ medication.name }}».</figcaption>
+    </figure>
 {% endif %}
+
 <p><strong>Цена:</strong> {{ medication.price }} BYN</p>
 <p><strong>В наличии:</strong> {% if medication.is_available %}да{% else %}нет{% endif %}</p>
 <p><strong>Категории:</strong>
     {% for c in medication.categories.all %}{{ c.name }}{% if not forloop.last %}, {% endif %}{% empty %}—{% endfor %}
 </p>
-<p><strong>Инструкция:</strong> {{ medication.instruction|linebreaks }}</p>
-<p><strong>Описание:</strong> {{ medication.description|linebreaks }}</p>
+<div><strong>Инструкция:</strong> {{ medication.instruction|linebreaks }}</div>
+<div><strong>Описание:</strong> {{ medication.description|linebreaks }}</div>
+<p><small>Обновлено: <time datetime="{{ medication.updated_at|date:'Y-m-d\TH:i' }}">{{ medication.updated_at|date:"d/m/Y H:i" }}</time></small></p>
+
+<p>
+    <button type="button" id="add-to-cart" data-code="{{ medication.code }}" data-name="{{ medication.name|escapejs }}" data-price="{{ medication.price|unlocalize }}">
+        Добавить в корзину
+    </button>
+</p>
+<p id="cart-message" role="status" aria-live="polite"></p>
 
 {% if is_owner %}
     <p>
@@ -24,5 +39,44 @@
 {% elif user_role == 'anonymous' %}
     <p><em>Для покупки <a href="{% url 'pharmacy:register' %}">зарегистрируйтесь</a> как покупатель.</em></p>
 {% endif %}
-<p><a href="{% url 'pharmacy:medication_list' %}">← К списку</a></p>
+<p><a href="{% url 'pharmacy:cart' %}">Перейти в корзину</a> | <a href="{% url 'pharmacy:medication_list' %}">← К списку</a></p>
+
+<script>
+(function () {
+    function readCart() {
+        try {
+            return JSON.parse(localStorage.getItem('pharmacy_cart') || '[]');
+        } catch (error) {
+            return [];
+        }
+    }
+    var button = document.getElementById('add-to-cart');
+    if (!button) {
+        return;
+    }
+    button.addEventListener('click', function () {
+        var code = button.getAttribute('data-code');
+        var name = button.getAttribute('data-name');
+        var price = parseFloat(button.getAttribute('data-price')) || 0;
+        var items = readCart();
+        var found = null;
+        for (var i = 0; i < items.length; i += 1) {
+            if (items[i].code === code) {
+                found = items[i];
+                break;
+            }
+        }
+        if (found) {
+            found.qty += 1;
+        } else {
+            items.push({ code: code, name: name, price: price, qty: 1 });
+        }
+        localStorage.setItem('pharmacy_cart', JSON.stringify(items));
+        var message = document.getElementById('cart-message');
+        if (message) {
+            message.textContent = 'Товар «' + name + '» добавлен в корзину.';
+        }
+    });
+})();
+</script>
 {% endblock %}

@@ -1,21 +1,52 @@
 {% extends 'pharmacy/base.html' %}
-{% block title %}Промокоды{% endblock %}
+{% block title %}Промокоды и купоны — Аптека «Здоровье+»{% endblock %}
 {% block content %}
 <h2>Промокоды и купоны</h2>
-<h3>Действующие</h3>
-<ul>
-    {% for promo in active_promos %}
-        <li>{{ promo.code }} — скидка {{ promo.discount_percent }}% ({{ promo.get_kind_display }})</li>
-    {% empty %}
-        <li>Нет действующих промокодов.</li>
-    {% endfor %}
-</ul>
-<h3>Архив</h3>
-<ul>
-    {% for promo in archived_promos %}
-        <li>{{ promo.code }} — {{ promo.discount_percent }}% (архив)</li>
-    {% empty %}
-        <li>Архив пуст.</li>
-    {% endfor %}
-</ul>
+<p><small>Действующие промокоды и архив. Скидки суммируются с акциями месяца.</small></p>
+
+<section>
+    <h3>Действующие</h3>
+    <table border="1" cellpadding="4" cellspacing="0">
+        <caption>Действующие промокоды и купоны аптеки «Здоровье+»</caption>
+        <thead>
+            <tr>
+                <th id="pr-code" scope="col">Код</th>
+                <th id="pr-kind" scope="col">Тип</th>
+                <th id="pr-discount" scope="col">Скидка</th>
+                <th id="pr-from" scope="col">Действует с</th>
+                <th id="pr-until" scope="col">Действует до</th>
+                <th id="pr-desc" scope="col">Описание</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for promo in active_promos %}
+                <tr>
+                    <td headers="pr-code"><mark>{{ promo.code }}</mark></td>
+                    <td headers="pr-kind">{{ promo.get_kind_display }}</td>
+                    <td headers="pr-discount">{{ promo.discount_percent }}% <s>без скидки</s></td>
+                    <td headers="pr-from"><time datetime="{{ promo.valid_from|date:'Y-m-d' }}">{{ promo.valid_from|date:"d/m/Y" }}</time></td>
+                    <td headers="pr-until"><time datetime="{{ promo.valid_until|date:'Y-m-d' }}">{{ promo.valid_until|date:"d/m/Y" }}</time></td>
+                    <td headers="pr-desc">{{ promo.description }}</td>
+                </tr>
+            {% empty %}
+                <tr><td colspan="6">Нет действующих промокодов.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</section>
+
+<section>
+    <h3>Архив</h3>
+    <ul>
+        {% for promo in archived_promos %}
+            <li>
+                <s>{{ promo.code }}</s> — скидка {{ promo.discount_percent }}% (архив);
+                действовал с <time datetime="{{ promo.valid_from|date:'Y-m-d' }}">{{ promo.valid_from|date:"d/m/Y" }}</time>
+                по <time datetime="{{ promo.valid_until|date:'Y-m-d' }}">{{ promo.valid_until|date:"d/m/Y" }}</time>
+            </li>
+        {% empty %}
+            <li>Архив пуст.</li>
+        {% endfor %}
+    </ul>
+</section>
 {% endblock %}

@@ -1,13 +1,33 @@
 {% extends 'pharmacy/base.html' %}
-{% block title %}Словарь терминов{% endblock %}
+{% block title %}Словарь терминов — Аптека «Здоровье+»{% endblock %}
 {% block content %}
 <h2>Словарь терминов и понятий</h2>
-<dl>
+<p>Список часто задаваемых вопросов: нажмите на вопрос, чтобы открыть развёрнутый ответ.</p>
+
+<section>
+    <h3>Вопросы и ответы</h3>
     {% for entry in entries %}
-        <dt><strong>{{ entry.question }}</strong> <small>({{ entry.added_at|date:"d/m/Y" }})</small></dt>
-        <dd>{{ entry.answer|linebreaks }}</dd>
+        <details>
+            <summary>
+                {{ entry.question }}
+                <small>(добавлено: <time datetime="{{ entry.added_at|date:'Y-m-d\TH:i' }}">{{ entry.added_at|date:"d/m/Y" }}</time>)</small>
+            </summary>
+            <dl>
+                <dt>Ответ</dt>
+                <dd>{{ entry.answer|linebreaks }}</dd>
+            </dl>
+        </details>
+        <hr>
     {% empty %}
         <p>Записей нет.</p>
     {% endfor %}
-</dl>
+</section>
+
+<section>
+    <h3>Полезные определения</h3>
+    <p><dfn>Рецептурный препарат</dfn> — лекарственное средство, отпускаемое только по рецепту врача.</p>
+    <p><dfn>БАД</dfn> (<abbr title="биологически активная добавка">биологически активная добавка</abbr>) — не является лекарством.</p>
+    <p>Народная мудрость: <q cite="https://www.who.int/ru">предупредить болезнь легче, чем лечить</q>.</p>
+    <p>Источник: <cite>Рекомендации ВОЗ по профилактике заболеваний</cite>.</p>
+</section>
 {% endblock %}

@@ -1,0 +1,118 @@
+{% extends 'pharmacy/base.html' %}
+{% block title %}Оплата товаров — Аптека «Здоровье+»{% endblock %}
+{% block content %}
+<h2>Оплата товаров</h2>
+<p><small>Демонстрационная страница оплаты: данные никуда не отправляются, корзина очищается на клиенте после нажатия кнопки.</small></p>
+
+<noscript>
+    <p><strong>Оплата недоступна:</strong> для оформления заказа включите JavaScript в браузере.</p>
+</noscript>
+
+<form id="payment-form" method="post">
+    {% csrf_token %}
+
+    <fieldset>
+        <legend>Данные покупателя</legend>
+        <p>
+            <label for="payer-name">Имя и фамилия</label><br>
+            <input type="text" id="payer-name" name="payer_name" required minlength="2" maxlength="120" placeholder="Иван Иванов">
+        </p>
+        <p>
+            <label for="payer-phone">Телефон</label><br>
+            <input type="tel" id="payer-phone" name="payer_phone" required pattern="\+375 \(29\) [0-9]{3}-[0-9]{2}-[0-9]{2}" placeholder="+375 (29) XXX-XX-XX">
+        </p>
+        <p>
+            <label for="payer-email">Электронная почта</label><br>
+            <input type="email" id="payer-email" name="payer_email" required placeholder="user@example.by">
+        </p>
+        <p>
+            <label for="payer-age">Возраст</label><br>
+            <input type="number" id="payer-age" name="payer_age" min="18" max="120" step="1" value="18">
+        </p>
+        <p>
+            <label for="pickup-point">Точка самовывоза</label><br>
+            <select id="pickup-point" name="pickup_point" required>
+                <option value="" selected>— выберите точку самовывоза —</option>
+                <optgroup label="Минск">
+                    <option value="center">Филиал «Центр», пр-т Независимости, 10</option>
+                    <option value="south">Филиал «Юг», ул. Будённого, 25</option>
+                    <option value="north">Филиал «Север», ул. Купалы, 7</option>
+                </optgroup>
+                <optgroup label="Другие города">
+                    <option value="brest">Брест, ул. Советская, 1</option>
+                    <option value="gomel">Гомель, пр-т Ленина, 2</option>
+                </optgroup>
+            </select>
+        </p>
+        <p>
+            <label for="delivery-date">Дата получения</label><br>
+            <input type="date" id="delivery-date" name="delivery_date" min="2026-09-15" max="2026-12-31">
+        </p>
+    </fieldset>
+
+    <fieldset>
+        <legend>Способ оплаты</legend>
+        <p>
+            <input type="radio" id="pay-card" name="payment_method" value="card" checked required>
+            <label for="pay-card">Банковская карта</label><br>
+            <input type="radio" id="pay-erip" name="payment_method" value="erip">
+            <label for="pay-erip">ЕРИП</label><br>
+            <input type="radio" id="pay-cash" name="payment_method" value="cash">
+            <label for="pay-cash">Наличные при получении</label>
+        </p>
+        <p>
+            <label for="card-number">Номер карты</label><br>
+            <input type="text" id="card-number" name="card_number" inputmode="numeric" pattern="[0-9]{16}" minlength="16" maxlength="16" placeholder="4111111111111111">
+            <br><small>Формат: 4111<wbr>1111<wbr>1111<wbr>1111 (16 цифр без пробелов).</small>
+        </p>
+        <p>
+            <label for="card-expiry">Срок действия</label><br>
+            <input type="month" id="card-expiry" name="card_expiry" min="2026-09" max="2035-12">
+        </p>
+        <p>
+            <label for="card-cvv">CVV-код</label><br>
+            <input type="password" id="card-cvv" name="card_cvv" pattern="[0-9]{3}" minlength="3" maxlength="3" autocomplete="off">
+        </p>
+        <p>
+            <label for="bank">Банк-эмитент</label><br>
+            <input type="text" id="bank" name="bank" list="bank-list" placeholder="Начните вводить название банка">
+            <datalist id="bank-list">
+                <option value="Приорбанк"></option>
+                <option value="Беларусбанк"></option>
+                <option value="БПС-Сбербанк"></option>
+                <option value="Белинвестбанк"></option>
+            </datalist>
+        </p>
+    </fieldset>
+
+    <fieldset>
+        <legend>Дополнительно</legend>
+        <p>
+            <label for="comment">Комментарий к заказу</label><br>
+            <textarea id="comment" name="comment" rows="4" cols="50" maxlength="500" placeholder="Например: позвонить за час до готовности"></textarea>
+        </p>
+        <p>
+            <input type="checkbox" id="agree" name="agree" required>
+            <label for="agree">Согласен с <a href="{% url 'pharmacy:privacy' %}">политикой конфиденциальности</a></label>
+        </p>
+        <p>
+            <button type="submit">Оплатить заказ</button>
+        </p>
+    </fieldset>
+</form>
+
+<p id="payment-message" role="status" aria-live="polite"></p>
+
+<script>
+(function () {
+    var form = document.getElementById('payment-form');
+    var message = document.getElementById('payment-message');
+    form.addEventListener('submit', function (event) {
+        event.preventDefault();
+        localStorage.removeItem('pharmacy_cart');
+        message.textContent = 'Оплата прошла успешно! Корзина очищена, заказ принят в обработку.';
+        form.reset();
+    });
+})();
+</script>
+{% endblock %}

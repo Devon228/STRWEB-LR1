@@ -451,6 +451,21 @@ class Review(TimeStampedModel):
         return f'{self.author_name} ({self.rating}/5)'
 
 
+class Partner(models.Model):
+    name = models.CharField('Название', max_length=200, unique=True)
+    website_url = models.URLField('Сайт компании')
+    logo_url = models.URLField('Ссылка на логотип', blank=True)
+    description = models.CharField('Краткое описание', max_length=255, blank=True)
+
+    class Meta:
+        verbose_name = 'Компания-партнёр'
+        verbose_name_plural = 'Компании-партнёры'
+        ordering = ['name']
+
+    def __str__(self):
+        return self.name
+
+
 class PromoCode(TimeStampedModel):
     class PromoKind(models.TextChoices):
         PROMO = 'promo', 'Промокод'

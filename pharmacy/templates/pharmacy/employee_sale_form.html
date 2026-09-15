@@ -1,11 +1,50 @@
 {% extends 'pharmacy/base.html' %}
-{% block title %}Новая продажа{% endblock %}
+{% block title %}Новая продажа — Аптека «Здоровье+»{% endblock %}
 {% block content %}
 <h2>Добавить продажу</h2>
 <p>Учитывается в аналитике. Дата не может быть в будущем.</p>
-<form method="post" novalidate>
+<form method="post">
     {% csrf_token %}
-    {{ form.as_p }}
+    {% if form.non_field_errors %}
+        <ul class="errorlist">
+            {% for error in form.non_field_errors %}
+                <li>{{ error }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+    <fieldset>
+        <legend>Параметры продажи</legend>
+        {% if form.employee %}
+            <p>
+                {{ form.employee.label_tag }}
+                {{ form.employee }}
+                {% if form.employee.errors %}
+                    <ul class="errorlist">{% for error in form.employee.errors %}<li>{{ error }}</li>{% endfor %}</ul>
+                {% endif %}
+            </p>
+        {% endif %}
+        <p>
+            {{ form.medication.label_tag }}
+            {{ form.medication }}
+            {% if form.medication.errors %}
+                <ul class="errorlist">{% for error in form.medication.errors %}<li>{{ error }}</li>{% endfor %}</ul>
+            {% endif %}
+        </p>
+        <p>
+            {{ form.quantity.label_tag }}
+            {{ form.quantity }}
+            {% if form.quantity.errors %}
+                <ul class="errorlist">{% for error in form.quantity.errors %}<li>{{ error }}</li>{% endfor %}</ul>
+            {% endif %}
+        </p>
+        <p>
+            {{ form.sold_at.label_tag }}
+            {{ form.sold_at }}
+            {% if form.sold_at.errors %}
+                <ul class="errorlist">{% for error in form.sold_at.errors %}<li>{{ error }}</li>{% endfor %}</ul>
+            {% endif %}
+        </p>
+    </fieldset>
     <button type="submit">Сохранить</button>
     <a href="{% url 'pharmacy:employee_sales' %}">Отмена</a>
 </form>

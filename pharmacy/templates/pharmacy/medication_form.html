@@ -2,9 +2,86 @@
 {% block title %}{{ form_title }}{% endblock %}
 {% block content %}
 <h2>{{ form_title }}</h2>
-<form method="post" enctype="multipart/form-data" novalidate>
+<form method="post" enctype="multipart/form-data">
     {% csrf_token %}
-    {{ form.as_p }}
+    {% if form.non_field_errors %}
+        <ul class="errorlist">
+            {% for error in form.non_field_errors %}
+                <li>{{ error }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+    <fieldset>
+        <legend>Основные сведения</legend>
+        <p>
+            {{ form.code.label_tag }}
+            {{ form.code }}
+            {% if form.code.errors %}
+                <ul class="errorlist">{% for error in form.code.errors %}<li>{{ error }}</li>{% endfor %}</ul>
+            {% endif %}
+        </p>
+        <p>
+            {{ form.name.label_tag }}
+            {{ form.name }}
+            {% if form.name.errors %}
+                <ul class="errorlist">{% for error in form.name.errors %}<li>{{ error }}</li>{% endfor %}</ul>
+            {% endif %}
+        </p>
+        <p>
+            {{ form.price.label_tag }}
+            {{ form.price }}
+            {% if form.price.errors %}
+                <ul class="errorlist">{% for error in form.price.errors %}<li>{{ error }}</li>{% endfor %}</ul>
+            {% endif %}
+        </p>
+        <p>
+            {{ form.photo.label_tag }}
+            {{ form.photo }}
+            {% if form.photo.errors %}
+                <ul class="errorlist">{% for error in form.photo.errors %}<li>{{ error }}</li>{% endfor %}</ul>
+            {% endif %}
+        </p>
+        <p>
+            {{ form.is_available }} {{ form.is_available.label_tag }}
+            {% if form.is_available.errors %}
+                <ul class="errorlist">{% for error in form.is_available.errors %}<li>{{ error }}</li>{% endfor %}</ul>
+            {% endif %}
+        </p>
+    </fieldset>
+    <fieldset>
+        <legend>Описание и инструкция</legend>
+        <p>
+            {{ form.instruction.label_tag }}
+            {{ form.instruction }}
+            {% if form.instruction.errors %}
+                <ul class="errorlist">{% for error in form.instruction.errors %}<li>{{ error }}</li>{% endfor %}</ul>
+            {% endif %}
+        </p>
+        <p>
+            {{ form.description.label_tag }}
+            {{ form.description }}
+            {% if form.description.errors %}
+                <ul class="errorlist">{% for error in form.description.errors %}<li>{{ error }}</li>{% endfor %}</ul>
+            {% endif %}
+        </p>
+    </fieldset>
+    <fieldset>
+        <legend>Категории и поставщики</legend>
+        <p>
+            {{ form.categories.label_tag }}
+            {{ form.categories }}
+            {% if form.categories.errors %}
+                <ul class="errorlist">{% for error in form.categories.errors %}<li>{{ error }}</li>{% endfor %}</ul>
+            {% endif %}
+        </p>
+        <p>
+            {{ form.suppliers.label_tag }}
+            {{ form.suppliers }}
+            {% if form.suppliers.errors %}
+                <ul class="errorlist">{% for error in form.suppliers.errors %}<li>{{ error }}</li>{% endfor %}</ul>
+            {% endif %}
+        </p>
+    </fieldset>
     <button type="submit">Сохранить</button>
     <a href="{% url 'pharmacy:medication_list' %}">Отмена</a>
 </form>
